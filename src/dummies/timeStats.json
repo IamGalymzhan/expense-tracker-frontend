@@ -1,0 +1,47 @@
+{
+  "БҮГІН": {
+    "completedTasks": {
+      "count": 5,
+      "percentage": 50
+    },
+    "incompleteTasks": {
+      "count": 3,
+      "percentage": 30
+    },
+    "inProgressTasks": {
+      "count": 2,
+      "percentage": 20
+    },
+    "totalTasks": 10
+  },
+  "АПТА": {
+    "completedTasks": {
+      "count": 15,
+      "percentage": 60
+    },
+    "incompleteTasks": {
+      "count": 5,
+      "percentage": 20
+    },
+    "inProgressTasks": {
+      "count": 5,
+      "percentage": 20
+    },
+    "totalTasks": 25
+  },
+  "ОСЫ АПТА": {
+    "completedTasks": {
+      "count": 20,
+      "percentage": 66.7
+    },
+    "incompleteTasks": {
+      "count": 5,
+      "percentage": 16.7
+    },
+    "inProgressTasks": {
+      "count": 5,
+      "percentage": 16.7
+    },
+    "totalTasks": 30
+  }
+} 

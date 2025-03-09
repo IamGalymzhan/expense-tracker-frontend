@@ -1,0 +1,17 @@
+{
+  "name": "Анар Серікқызы",
+  "email": "anar.serik@example.com",
+  "avatar": null,
+  "achievements": [
+    {
+      "id": 1,
+      "title": "Үнемдеуші",
+      "description": "1 ай бойы шығындарды азайту"
+    },
+    {
+      "id": 2,
+      "title": "Тиімді",
+      "description": "10 тапсырманы уақытында орындау"
+    }
+  ]
+} 

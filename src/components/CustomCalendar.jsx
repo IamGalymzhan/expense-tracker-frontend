@@ -1,0 +1,438 @@
+import { useState } from "react";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Paper,
+  Modal,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+} from "@mui/material";
+import {
+  ChevronLeft,
+  ChevronRight,
+  KeyboardDoubleArrowLeft,
+  KeyboardDoubleArrowRight,
+} from "@mui/icons-material";
+import dayjs from "dayjs";
+import "dayjs/locale/kk"; // Kazakh locale
+import { useTranslation } from "react-i18next";
+
+const WEEKDAYS = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+const MONTHS = [
+  "Қаңтар",
+  "Ақпан",
+  "Наурыз",
+  "Сәуір",
+  "Мамыр",
+  "Маусым",
+  "Шілде",
+  "Тамыз",
+  "Қыркүйек",
+  "Қазан",
+  "Қараша",
+  "Желтоқсан",
+];
+
+const TaskModal = ({ open, onClose, date, tasks, t }) => {
+  return (
+    <Modal open={open} onClose={onClose} aria-labelledby="task-modal-title">
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: { xs: "90%", sm: 400 },
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+          borderRadius: 2,
+        }}
+      >
+        <Typography
+          id="task-modal-title"
+          variant="h6"
+          component="h2"
+          gutterBottom
+        >
+          {dayjs(date).format("D MMMM YYYY")}
+        </Typography>
+        <List>
+          {tasks.map((task, index) => (
+            <ListItem key={index}>
+              <ListItemText
+                primary={task.title}
+                secondary={`${t("tasks.deadline")}: ${task.deadline}`}
+                sx={{
+                  "& .MuiListItemText-primary": {
+                    color:
+                      task.status === t("tasks.completed")
+                        ? "success.main"
+                        : "text.primary",
+                  },
+                }}
+              />
+              <Chip
+                label={task.status}
+                color={
+                  task.status === t("tasks.completed")
+                    ? "success"
+                    : task.status === t("tasks.inProgress")
+                    ? "warning"
+                    : "default"
+                }
+                size="small"
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </Modal>
+  );
+};
+
+const CustomCalendar = ({ tasks = [], onDateSelect }) => {
+  const { t } = useTranslation();
+  const [currentDate, setCurrentDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handlePrevMonth = () => {
+    setCurrentDate(currentDate.subtract(1, "month"));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(currentDate.add(1, "month"));
+  };
+
+  const handlePrevYear = () => {
+    setCurrentDate(currentDate.subtract(1, "year"));
+  };
+
+  const handleNextYear = () => {
+    setCurrentDate(currentDate.add(1, "year"));
+  };
+
+  const getTasksForDate = (date) => {
+    // Ensure tasks is an array
+    if (!Array.isArray(tasks)) {
+      return [];
+    }
+
+    return tasks.filter(
+      (task) =>
+        dayjs(task.deadline).format("YYYY-MM-DD") === date.format("YYYY-MM-DD")
+    );
+  };
+
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    const dateTasks = getTasksForDate(date);
+    if (dateTasks.length > 0) {
+      setModalOpen(true);
+    }
+    onDateSelect(date);
+  };
+
+  const renderCalendar = () => {
+    const firstDay = currentDate.startOf("month");
+    const daysInMonth = currentDate.daysInMonth();
+    const startingDay = firstDay.day() === 0 ? 6 : firstDay.day() - 1;
+
+    const days = [];
+    let day = 1;
+
+    // Previous month days
+    const prevMonth = currentDate.subtract(1, "month");
+    const prevMonthDays = prevMonth.daysInMonth();
+    for (let i = startingDay - 1; i >= 0; i--) {
+      days.push({
+        day: prevMonthDays - i,
+        currentMonth: false,
+        date: prevMonth.date(prevMonthDays - i),
+      });
+    }
+
+    // Current month days
+    while (day <= daysInMonth) {
+      const date = currentDate.date(day);
+      const dayTasks = getTasksForDate(date);
+      days.push({
+        day,
+        currentMonth: true,
+        date,
+        tasks: dayTasks,
+      });
+      day++;
+    }
+
+    // Next month days
+    let nextDay = 1;
+    while (days.length % 7 !== 0) {
+      days.push({
+        day: nextDay,
+        currentMonth: false,
+        date: currentDate.add(1, "month").date(nextDay),
+      });
+      nextDay++;
+    }
+
+    return days;
+  };
+
+  const getMonthName = (monthIndex) => {
+    const monthKeys = [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ];
+    return t(`dashboard.${monthKeys[monthIndex]}`);
+  };
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        backgroundColor: "#fff",
+        borderRadius: 2,
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      <Box
+        sx={{
+          mb: 3,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton
+            onClick={handlePrevYear}
+            size="medium"
+            sx={{
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <KeyboardDoubleArrowLeft />
+          </IconButton>
+          <IconButton
+            onClick={handlePrevMonth}
+            size="medium"
+            sx={{
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <ChevronLeft />
+          </IconButton>
+        </Box>
+
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 500,
+            color: "primary.main",
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+          }}
+        >
+          {getMonthName(currentDate.month())} {currentDate.year()}
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <IconButton
+            onClick={handleNextMonth}
+            size="medium"
+            sx={{
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <ChevronRight />
+          </IconButton>
+          <IconButton
+            onClick={handleNextYear}
+            size="medium"
+            sx={{
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.04)",
+              },
+            }}
+          >
+            <KeyboardDoubleArrowRight />
+          </IconButton>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
+        {WEEKDAYS.map((day) => (
+          <Typography
+            key={day}
+            sx={{
+              textAlign: "center",
+              fontWeight: 600,
+              fontSize: "1rem",
+              color: "text.secondary",
+              py: 1,
+            }}
+          >
+            {day}
+          </Typography>
+        ))}
+      </Box>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: 1.5,
+        }}
+      >
+        {renderCalendar().map((dateObj, index) => {
+          const dateTasks = dateObj.tasks || [];
+          const hasMoreTasks = dateTasks.length > 0;
+          const hasSingleTask = dateTasks.length === 1;
+          const hasMultipleTasks = dateTasks.length > 1;
+
+          return (
+            <Box
+              key={index}
+              onClick={() => handleDateClick(dateObj.date)}
+              sx={{
+                p: 1.5,
+                border: "1px solid",
+                borderColor: dateObj.currentMonth ? "divider" : "transparent",
+                borderRadius: 2,
+                cursor: "pointer",
+                opacity: dateObj.currentMonth ? 1 : 0.4,
+                backgroundColor: dateObj.currentMonth
+                  ? "background.paper"
+                  : "transparent",
+                transition: "all 0.2s ease-in-out",
+                minHeight: "100px",
+                display: "flex",
+                flexDirection: "column",
+                position: "relative",
+                "&:hover": {
+                  backgroundColor: "action.hover",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "1.1rem",
+                  fontWeight: dateObj.currentMonth ? 500 : 400,
+                  color: dateObj.currentMonth
+                    ? "text.primary"
+                    : "text.secondary",
+                }}
+              >
+                {dateObj.day}
+              </Typography>
+
+              {hasSingleTask && (
+                <Box
+                  sx={{
+                    mt: "auto",
+                    backgroundColor: (theme) => {
+                      const status = dateTasks[0].status;
+                      return status === t("tasks.completed")
+                        ? theme.palette.success.light
+                        : status === t("tasks.inProgress")
+                        ? theme.palette.warning.light
+                        : theme.palette.info.light;
+                    },
+                    color: "text.primary",
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    position: "absolute",
+                    bottom: 8,
+                    left: 8,
+                    right: 8,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "0.75rem",
+                      display: "block",
+                    }}
+                  >
+                    {dateTasks[0].title}
+                  </Typography>
+                </Box>
+              )}
+
+              {hasMultipleTasks && (
+                <Box
+                  sx={{
+                    mt: "auto",
+                    backgroundColor: "grey.100",
+                    color: "text.secondary",
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    position: "absolute",
+                    bottom: 8,
+                    right: 8,
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    + {t("tasks.more")} {dateTasks.length}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          );
+        })}
+      </Box>
+
+      <TaskModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        date={selectedDate}
+        tasks={selectedDate ? getTasksForDate(selectedDate) : []}
+        t={t}
+      />
+    </Paper>
+  );
+};
+
+export default CustomCalendar;

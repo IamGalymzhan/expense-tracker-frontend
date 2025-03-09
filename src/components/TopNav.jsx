@@ -133,7 +133,7 @@ const TopNav = () => {
           component="div"
           sx={{ flexGrow: 1, fontWeight: "bold", textAlign: "right" }}
         >
-          {t("navigation.appTitle")}
+          Expense Tracker
         </Typography>
         <IconButton
           color="inherit"

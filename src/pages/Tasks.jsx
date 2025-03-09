@@ -107,7 +107,7 @@ const Tasks = () => {
     title: "",
     duration: "",
     deadline: dayjs(),
-    status: t("tasks.planned"),
+    status: "PLANNED",
   });
   const navigate = useNavigate();
   const [taskStats, setTaskStats] = useState({
@@ -352,31 +352,44 @@ const Tasks = () => {
               onDateChange={handleDateChange}
               tasks={tasks}
             />
-            <ToggleButtonGroup
-              value={filter}
-              exclusive
-              onChange={handleFilterChange}
-              sx={{ mt: 2 }}
-            >
-              <ToggleButton value="all">{t("filters.all")}</ToggleButton>
-              <ToggleButton value="today">{t("tasks.today")}</ToggleButton>
-              <ToggleButton value="week">{t("tasks.thisWeek")}</ToggleButton>
-              <ToggleButton value="month">{t("tasks.thisMonth")}</ToggleButton>
-            </ToggleButtonGroup>
+            <Box sx={{ overflowX: "auto", mt: 2 }}>
+              <ToggleButtonGroup
+                value={filter}
+                exclusive
+                onChange={handleFilterChange}
+                sx={{
+                  minWidth: { xs: "100%", sm: "auto" },
+                  "& .MuiToggleButton-root": {
+                    px: { xs: 1, sm: 2 },
+                    py: 1,
+                    fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                  },
+                }}
+              >
+                <ToggleButton value="all">{t("filters.all")}</ToggleButton>
+                <ToggleButton value="today">{t("tasks.today")}</ToggleButton>
+                <ToggleButton value="week">{t("tasks.thisWeek")}</ToggleButton>
+                <ToggleButton value="month">
+                  {t("tasks.thisMonth")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
           </Box>
 
           {/* Task List */}
-          <Paper sx={{ p: 3, mb: 4 }}>
+          <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 4 }}>
             <Stack
-              direction="row"
+              direction={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: "stretch", sm: "center" }}
+              spacing={{ xs: 2, sm: 0 }}
               mb={2}
             >
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={handleOpenDialog}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 {t("tasks.add")}
               </Button>
@@ -384,7 +397,8 @@ const Tasks = () => {
                 label={t("tasks.search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{ width: 200 }}
+                sx={{ width: { xs: "100%", sm: 200 } }}
+                size="small"
               />
             </Stack>
 
@@ -394,48 +408,71 @@ const Tasks = () => {
                 <Box
                   key={task._id}
                   sx={{
-                    p: 2,
+                    p: { xs: 1.5, sm: 2 },
                     mb: 2,
                     border: "1px solid #e0e0e0",
                     borderRadius: 1,
                     display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
                     justifyContent: "space-between",
-                    alignItems: "center",
+                    alignItems: { xs: "flex-start", sm: "center" },
+                    gap: { xs: 1, sm: 0 },
                   }}
                 >
-                  <Box>
-                    <Typography variant="h6">{task.title}</Typography>
+                  <Box sx={{ width: { xs: "100%", sm: "auto" } }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                    >
+                      {task.title}
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {t("tasks.deadline")}:{" "}
                       {dayjs(task.deadline).format("DD.MM.YYYY")}
                     </Typography>
                   </Box>
-                  <Stack direction="row" spacing={1}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                      width: { xs: "100%", sm: "auto" },
+                      justifyContent: { xs: "flex-end", sm: "flex-start" },
+                      mt: { xs: 1, sm: 0 },
+                    }}
+                  >
                     <Chip
-                      label={task.status}
+                      label={t(`tasks.${task.status.toLowerCase()}`)}
                       color={
-                        task.status === t("tasks.completed")
+                        task.status === "COMPLETED"
                           ? "success"
-                          : task.status === t("tasks.inProgress")
+                          : task.status === "IN_PROGRESS"
                           ? "primary"
                           : "default"
                       }
+                      size="small"
+                      sx={{ height: { xs: "24px", sm: "32px" } }}
                     />
-                    <IconButton onClick={() => handleEditTask(task)}>
-                      <EditIcon />
+                    <IconButton
+                      onClick={() => handleEditTask(task)}
+                      size="small"
+                      sx={{ p: { xs: 0.5, sm: 1 } }}
+                    >
+                      <EditIcon fontSize="small" />
                     </IconButton>
                     <IconButton
                       onClick={() => handleStartPomodoro(task._id)}
                       color={currentTaskId === task._id ? "primary" : "default"}
+                      size="small"
+                      sx={{ p: { xs: 0.5, sm: 1 } }}
                     >
                       {currentTaskId === task._id ? (
                         isRunning ? (
-                          <PauseIcon />
+                          <PauseIcon fontSize="small" />
                         ) : (
-                          <PlayArrowIcon />
+                          <PlayArrowIcon fontSize="small" />
                         )
                       ) : (
-                        <PlayArrowIcon />
+                        <PlayArrowIcon fontSize="small" />
                       )}
                     </IconButton>
                   </Stack>
@@ -453,7 +490,15 @@ const Tasks = () => {
       </Box>
 
       {/* Task Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: { width: { xs: "95%", sm: "auto" }, m: { xs: 1, sm: 2 } },
+        }}
+      >
         <DialogTitle>{editTask ? t("tasks.edit") : t("tasks.add")}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
@@ -463,6 +508,7 @@ const Tasks = () => {
               value={form.title}
               onChange={handleChange}
               fullWidth
+              size="small"
             />
             <TextField
               label={t("tasks.duration")}
@@ -471,6 +517,7 @@ const Tasks = () => {
               value={form.duration}
               onChange={handleChange}
               fullWidth
+              size="small"
             />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
@@ -479,10 +526,15 @@ const Tasks = () => {
                 onChange={(newValue) =>
                   setForm({ ...form, deadline: newValue })
                 }
-                renderInput={(params) => <TextField {...params} fullWidth />}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "small",
+                  },
+                }}
               />
             </LocalizationProvider>
-            <FormControl fullWidth>
+            <FormControl fullWidth size="small">
               <InputLabel>{t("tasks.status")}</InputLabel>
               <Select
                 name="status"
@@ -490,20 +542,14 @@ const Tasks = () => {
                 onChange={handleChange}
                 label={t("tasks.status")}
               >
-                <MenuItem value={t("tasks.planned")}>
-                  {t("tasks.planned")}
-                </MenuItem>
-                <MenuItem value={t("tasks.inProgress")}>
-                  {t("tasks.inProgress")}
-                </MenuItem>
-                <MenuItem value={t("tasks.completed")}>
-                  {t("tasks.completed")}
-                </MenuItem>
+                <MenuItem value="PLANNED">{t("tasks.planned")}</MenuItem>
+                <MenuItem value="IN_PROGRESS">{t("tasks.inProgress")}</MenuItem>
+                <MenuItem value="COMPLETED">{t("tasks.completed")}</MenuItem>
               </Select>
             </FormControl>
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleCloseDialog}>{t("common.cancel")}</Button>
           <Button onClick={handleSubmit} variant="contained">
             {t("common.save")}
@@ -516,24 +562,36 @@ const Tasks = () => {
         <Box
           sx={{
             position: "fixed",
-            bottom: 20,
-            right: 20,
+            bottom: { xs: 10, sm: 20 },
+            right: { xs: 10, sm: 20 },
             bgcolor: "white",
-            p: 2,
+            p: { xs: 1.5, sm: 2 },
             borderRadius: 2,
             boxShadow: 3,
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: { xs: 1, sm: 2 },
+            zIndex: 1100,
           }}
         >
-          <Typography variant="h6">
+          <Typography
+            variant="h6"
+            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          >
             {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, "0")}
           </Typography>
-          <IconButton onClick={handleToggleTimer}>
+          <IconButton
+            onClick={handleToggleTimer}
+            size="small"
+            sx={{ p: { xs: 0.5, sm: 1 } }}
+          >
             {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
           </IconButton>
-          <IconButton onClick={handleResetTimer}>
+          <IconButton
+            onClick={handleResetTimer}
+            size="small"
+            sx={{ p: { xs: 0.5, sm: 1 } }}
+          >
             <ReplayIcon />
           </IconButton>
         </Box>

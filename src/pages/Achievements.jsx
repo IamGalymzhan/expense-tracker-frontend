@@ -443,6 +443,7 @@ const AchievementCard = ({ achievement, isNew = false, onSelect }) => {
   );
 };
 
+/* Commenting out PersonalRecord component as it's not ready yet
 const PersonalRecord = ({ icon, value, label }) => {
   const getIcon = () => {
     // Use emoji instead of image
@@ -499,6 +500,7 @@ const PersonalRecord = ({ icon, value, label }) => {
     </Card>
   );
 };
+*/
 
 const Achievements = () => {
   const [selectedAchievement, setSelectedAchievement] = useState(null);
@@ -603,7 +605,8 @@ const Achievements = () => {
   const unlockedAchievements = allAchievements.filter((a) => a.unlocked);
   const lockedAchievements = allAchievements.filter((a) => !a.unlocked);
 
-  // Personal records logic
+  // Comment out personal records data
+  /*
   const records = [
     {
       icon: "💰", // Expense icon
@@ -626,6 +629,7 @@ const Achievements = () => {
       label: t("achievements.progress"),
     },
   ];
+  */
 
   return (
     <Box>
@@ -697,6 +701,7 @@ const Achievements = () => {
                 </Button>
               </Box>
 
+              {/* Comment out Personal Records section
               <Typography
                 variant="h5"
                 gutterBottom
@@ -716,6 +721,7 @@ const Achievements = () => {
                   </Grid>
                 ))}
               </Grid>
+              */}
 
               <Typography
                 variant="h5"

@@ -34,7 +34,7 @@ const Settings = () => {
   const [notifications, setNotifications] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [settings, setSettings] = useState({
     language: language,
@@ -55,7 +55,7 @@ const Settings = () => {
       setNotifications(profile.preferences.notifications || false);
 
       // Set user profile data
-      setFullName(profile.name || "");
+      setName(profile.name || "");
       setEmail(profile.email || "");
     } catch (err) {
       console.error(t("settings.errorLoading"), err);
@@ -65,13 +65,17 @@ const Settings = () => {
   const handleSaveSettings = async () => {
     try {
       await userService.updateProfile({
-        fullName,
+        name,
         email,
         preferences: { ...settings, notifications: notifications },
       });
+
+      // Refresh the settings to show updated values
+      await fetchSettings();
       alert(t("common.saveSuccess"));
     } catch (err) {
       console.error(t("settings.errorSaving"), err);
+      alert(t("settings.errorSaving"));
     }
   };
 
@@ -115,8 +119,8 @@ const Settings = () => {
     setSettings((prev) => ({ ...prev, notifications: newValue }));
   };
 
-  const handleFullNameChange = (event) => {
-    setFullName(event.target.value);
+  const handleNameChange = (event) => {
+    setName(event.target.value);
   };
 
   const handleEmailChange = (event) => {
@@ -151,10 +155,12 @@ const Settings = () => {
             {t("settings.title")}
           </Typography>
 
+          {/* Profile Settings */}
           <Paper
             elevation={0}
             sx={{
               p: { xs: 1.5, sm: 2, md: 3 },
+              mb: 4,
               borderRadius: 2,
               bgcolor: "white",
               boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -163,44 +169,73 @@ const Settings = () => {
               alignItems: "center",
             }}
           >
-            {/* Profile Settings */}
-            <Box sx={{ mb: 4, width: "100%", maxWidth: "500px" }}>
-              <Typography
-                variant="h6"
-                gutterBottom
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{
+                fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                textAlign: "center",
+                mb: 3,
+              }}
+            >
+              {t("settings.profile")}
+            </Typography>
+            <Stack spacing={2} sx={{ width: "100%", maxWidth: "500px" }}>
+              <TextField
+                label={t("settings.fullName")}
+                fullWidth
+                variant="outlined"
+                value={name}
+                onChange={handleNameChange}
+              />
+              <TextField
+                label={t("settings.email")}
+                fullWidth
+                variant="outlined"
+                value={email}
+                onChange={handleEmailChange}
+              />
+              <Button
+                variant="contained"
+                onClick={handleSaveSettings}
                 sx={{
-                  fontSize: { xs: "1.1rem", sm: "1.25rem" },
-                  textAlign: "center",
+                  bgcolor: "#1a237e",
+                  "&:hover": {
+                    bgcolor: "#0d1b60",
+                  },
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                  minWidth: "150px",
+                  alignSelf: "center",
                 }}
               >
-                {t("settings.profile")}
-              </Typography>
-              <Stack spacing={2} sx={{ width: "100%" }}>
-                <TextField
-                  label={t("settings.fullName")}
-                  fullWidth
-                  variant="outlined"
-                  value={fullName}
-                  onChange={handleFullNameChange}
-                />
-                <TextField
-                  label={t("settings.email")}
-                  fullWidth
-                  variant="outlined"
-                  value={email}
-                  onChange={handleEmailChange}
-                />
-              </Stack>
-            </Box>
+                {t("common.save")}
+              </Button>
+            </Stack>
+          </Paper>
 
+          {/* App Settings */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 1.5, sm: 2, md: 3 },
+              mb: 4,
+              borderRadius: 2,
+              bgcolor: "white",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             {/* Notification Settings */}
-            <Box sx={{ mb: 4, width: "100%", maxWidth: "500px" }}>
+            <Box sx={{ width: "100%", maxWidth: "500px", mb: 4 }}>
               <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
                   textAlign: "center",
+                  mb: 3,
                 }}
               >
                 {t("settings.notifications")}
@@ -219,13 +254,14 @@ const Settings = () => {
             </Box>
 
             {/* Language Settings */}
-            <Box sx={{ mb: 4, width: "100%", maxWidth: "500px" }}>
+            <Box sx={{ width: "100%", maxWidth: "500px", mb: 4 }}>
               <Typography
                 variant="h6"
                 gutterBottom
                 sx={{
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
                   textAlign: "center",
+                  mb: 3,
                 }}
               >
                 {t("settings.language")}
@@ -244,14 +280,52 @@ const Settings = () => {
                 </FormControl>
               </Box>
             </Box>
+          </Paper>
 
-            {/* Save Button */}
-            <Box
-              sx={{ mt: 4, mb: 2, display: "flex", justifyContent: "center" }}
+          {/* Password Change */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 1.5, sm: 2, md: 3 },
+              borderRadius: 2,
+              bgcolor: "white",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{
+                fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                textAlign: "center",
+                mb: 3,
+              }}
             >
+              {t("settings.changePassword")}
+            </Typography>
+            <Stack spacing={2} sx={{ width: "100%", maxWidth: "500px" }}>
+              <TextField
+                label={t("settings.currentPassword")}
+                type="password"
+                fullWidth
+                variant="outlined"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
+              <TextField
+                label={t("settings.newPassword")}
+                type="password"
+                fullWidth
+                variant="outlined"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
               <Button
                 variant="contained"
-                onClick={handleSaveSettings}
+                onClick={handleChangePassword}
                 sx={{
                   bgcolor: "#1a237e",
                   "&:hover": {
@@ -259,58 +333,12 @@ const Settings = () => {
                   },
                   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                   minWidth: "150px",
+                  alignSelf: "center",
                 }}
               >
-                {t("common.save")}
+                {t("settings.updatePassword")}
               </Button>
-            </Box>
-
-            {/* Password Change */}
-            <Box sx={{ mb: 4, width: "100%", maxWidth: "500px" }}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontSize: { xs: "1.1rem", sm: "1.25rem" },
-                  textAlign: "center",
-                }}
-              >
-                {t("settings.changePassword")}
-              </Typography>
-              <Stack spacing={2} sx={{ width: "100%" }}>
-                <TextField
-                  label={t("settings.currentPassword")}
-                  type="password"
-                  fullWidth
-                  variant="outlined"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                />
-                <TextField
-                  label={t("settings.newPassword")}
-                  type="password"
-                  fullWidth
-                  variant="outlined"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
-                <Box sx={{ display: "flex", justifyContent: "center" }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleChangePassword}
-                    sx={{
-                      bgcolor: "#1a237e",
-                      "&:hover": {
-                        bgcolor: "#0d1b60",
-                      },
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    {t("settings.updatePassword")}
-                  </Button>
-                </Box>
-              </Stack>
-            </Box>
+            </Stack>
           </Paper>
         </Container>
       </Box>

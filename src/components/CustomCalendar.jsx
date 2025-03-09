@@ -69,18 +69,18 @@ const TaskModal = ({ open, onClose, date, tasks, t }) => {
                 sx={{
                   "& .MuiListItemText-primary": {
                     color:
-                      task.status === t("tasks.completed")
+                      task.status === "COMPLETED"
                         ? "success.main"
                         : "text.primary",
                   },
                 }}
               />
               <Chip
-                label={task.status}
+                label={t(`tasks.${task.status.toLowerCase()}`)}
                 color={
-                  task.status === t("tasks.completed")
+                  task.status === "COMPLETED"
                     ? "success"
-                    : task.status === t("tasks.inProgress")
+                    : task.status === "IN_PROGRESS"
                     ? "warning"
                     : "default"
                 }
@@ -205,42 +205,45 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
     <Paper
       elevation={0}
       sx={{
-        p: 3,
+        p: { xs: 1.5, sm: 3 },
         backgroundColor: "#fff",
         borderRadius: 2,
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        overflow: "hidden", // Prevent overflow on small screens
       }}
     >
       <Box
         sx={{
-          mb: 3,
+          mb: { xs: 1.5, sm: 3 },
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: { xs: 0, sm: 1 } }}
+        >
           <IconButton
             onClick={handlePrevYear}
-            size="medium"
+            size="small"
             sx={{
               "&:hover": {
                 backgroundColor: "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
-            <KeyboardDoubleArrowLeft />
+            <KeyboardDoubleArrowLeft fontSize="small" />
           </IconButton>
           <IconButton
             onClick={handlePrevMonth}
-            size="medium"
+            size="small"
             sx={{
               "&:hover": {
                 backgroundColor: "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
-            <ChevronLeft />
+            <ChevronLeft fontSize="small" />
           </IconButton>
         </Box>
 
@@ -249,34 +252,38 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
           sx={{
             fontWeight: 500,
             color: "primary.main",
-            fontSize: { xs: "1.5rem", sm: "2rem" },
+            fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            textAlign: "center",
+            whiteSpace: { xs: "normal", sm: "nowrap" },
           }}
         >
           {getMonthName(currentDate.month())} {currentDate.year()}
         </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", gap: { xs: 0, sm: 1 } }}
+        >
           <IconButton
             onClick={handleNextMonth}
-            size="medium"
+            size="small"
             sx={{
               "&:hover": {
                 backgroundColor: "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
-            <ChevronRight />
+            <ChevronRight fontSize="small" />
           </IconButton>
           <IconButton
             onClick={handleNextYear}
-            size="medium"
+            size="small"
             sx={{
               "&:hover": {
                 backgroundColor: "rgba(0, 0, 0, 0.04)",
               },
             }}
           >
-            <KeyboardDoubleArrowRight />
+            <KeyboardDoubleArrowRight fontSize="small" />
           </IconButton>
         </Box>
       </Box>
@@ -285,8 +292,8 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
         sx={{
           display: "grid",
           gridTemplateColumns: "repeat(7, 1fr)",
-          gap: 1.5,
-          mb: 2,
+          gap: { xs: 0.5, sm: 1, md: 1.5 },
+          mb: { xs: 1, sm: 2 },
         }}
       >
         {WEEKDAYS.map((day) => (
@@ -295,9 +302,9 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
             sx={{
               textAlign: "center",
               fontWeight: 600,
-              fontSize: "1rem",
+              fontSize: { xs: "0.7rem", sm: "0.8rem", md: "1rem" },
               color: "text.secondary",
-              py: 1,
+              py: { xs: 0.5, sm: 1 },
             }}
           >
             {day}
@@ -309,7 +316,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
         sx={{
           display: "grid",
           gridTemplateColumns: "repeat(7, 1fr)",
-          gap: 1.5,
+          gap: { xs: 0.5, sm: 1, md: 1.5 },
         }}
       >
         {renderCalendar().map((dateObj, index) => {
@@ -323,7 +330,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
               key={index}
               onClick={() => handleDateClick(dateObj.date)}
               sx={{
-                p: 1.5,
+                p: { xs: 0.5, sm: 1, md: 1.5 },
                 border: "1px solid",
                 borderColor: dateObj.currentMonth ? "divider" : "transparent",
                 borderRadius: 2,
@@ -333,7 +340,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                   ? "background.paper"
                   : "transparent",
                 transition: "all 0.2s ease-in-out",
-                minHeight: "100px",
+                minHeight: { xs: "60px", sm: "80px", md: "100px" },
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
@@ -346,7 +353,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
             >
               <Typography
                 sx={{
-                  fontSize: "1.1rem",
+                  fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1.1rem" },
                   fontWeight: dateObj.currentMonth ? 500 : 400,
                   color: dateObj.currentMonth
                     ? "text.primary"
@@ -362,20 +369,20 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                     mt: "auto",
                     backgroundColor: (theme) => {
                       const status = dateTasks[0].status;
-                      return status === t("tasks.completed")
+                      return status === "COMPLETED"
                         ? theme.palette.success.light
-                        : status === t("tasks.inProgress")
+                        : status === "IN_PROGRESS"
                         ? theme.palette.warning.light
                         : theme.palette.info.light;
                     },
                     color: "text.primary",
                     borderRadius: 1,
-                    px: 1,
+                    px: { xs: 0.5, sm: 1 },
                     py: 0.5,
                     position: "absolute",
-                    bottom: 8,
-                    left: 8,
-                    right: 8,
+                    bottom: { xs: 2, sm: 8 },
+                    left: { xs: 2, sm: 8 },
+                    right: { xs: 2, sm: 8 },
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -385,7 +392,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                     variant="caption"
                     sx={{
                       fontWeight: 500,
-                      fontSize: "0.75rem",
+                      fontSize: { xs: "0.6rem", sm: "0.75rem" },
                       display: "block",
                     }}
                   >
@@ -401,21 +408,21 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                     backgroundColor: "grey.100",
                     color: "text.secondary",
                     borderRadius: 1,
-                    px: 1,
+                    px: { xs: 0.5, sm: 1 },
                     py: 0.5,
                     position: "absolute",
-                    bottom: 8,
-                    right: 8,
+                    bottom: { xs: 2, sm: 8 },
+                    right: { xs: 2, sm: 8 },
                   }}
                 >
                   <Typography
                     variant="caption"
                     sx={{
                       fontWeight: 500,
-                      fontSize: "0.75rem",
+                      fontSize: { xs: "0.6rem", sm: "0.75rem" },
                     }}
                   >
-                    + {t("tasks.more")} {dateTasks.length}
+                    + {dateTasks.length}
                   </Typography>
                 </Box>
               )}

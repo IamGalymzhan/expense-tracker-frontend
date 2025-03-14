@@ -16,10 +16,6 @@ export const authService = {
       localStorage.setItem("token", response.token);
       localStorage.setItem("user", JSON.stringify(response.user));
     }
-    const response2 = await apiClient.post(
-      "/achievements/initialize",
-      userData
-    );
     return response;
   },
 

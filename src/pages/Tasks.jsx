@@ -34,6 +34,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import ReplayIcon from "@mui/icons-material/Replay";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Line, Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -272,10 +273,16 @@ const Tasks = () => {
 
   const handleDelete = async (id) => {
     try {
+      console.log("Deleting task with ID:", id);
+      if (!id) {
+        console.error("Cannot delete task: ID is undefined");
+        return;
+      }
       await taskService.deleteTask(id);
       await taskService.refreshTasks();
     } catch (err) {
       console.error(t("tasks.errorDeleting"), err);
+      alert(t("tasks.errorDeleting") + ": " + err.message);
     }
   };
 
@@ -318,6 +325,25 @@ const Tasks = () => {
   // Add refresh button handler
   const handleRefresh = () => {
     fetchTasks(true);
+  };
+
+  // 🆕 Pomodoro timer handlers
+  const handleStartPomodoro = (taskId) => {
+    console.log("Starting Pomodoro for task ID:", taskId);
+    if (!taskId) {
+      console.error("Cannot start Pomodoro: Task ID is undefined");
+      return;
+    }
+    setCurrentTaskId(taskId);
+    setIsRunning(true);
+  };
+
+  const handleToggleTimer = () => {
+    setIsRunning(!isRunning);
+  };
+
+  const handleResetTimer = () => {
+    setTimer(breakTime ? 300 : 1500);
   };
 
   return (
@@ -441,7 +467,13 @@ const Tasks = () => {
                     }}
                   >
                     <Chip
-                      label={t(`tasks.${task.status.toLowerCase()}`)}
+                      label={t(
+                        `tasks.${
+                          task.status === "IN_PROGRESS"
+                            ? "inProgress"
+                            : task.status.toLowerCase()
+                        }`
+                      )}
                       color={
                         task.status === "COMPLETED"
                           ? "success"
@@ -460,12 +492,43 @@ const Tasks = () => {
                       <EditIcon fontSize="small" />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleStartPomodoro(task._id)}
-                      color={currentTaskId === task._id ? "primary" : "default"}
+                      onClick={() => {
+                        const taskId = task._id || task.id;
+                        if (!taskId) {
+                          console.error("Task ID is undefined:", task);
+                          alert("Cannot delete task: ID is missing");
+                          return;
+                        }
+                        handleDelete(taskId);
+                      }}
+                      color="error"
                       size="small"
                       sx={{ p: { xs: 0.5, sm: 1 } }}
                     >
-                      {currentTaskId === task._id ? (
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        const taskId = task._id || task.id;
+                        if (!taskId) {
+                          console.error(
+                            "Task ID is undefined for Pomodoro:",
+                            task
+                          );
+                          alert("Cannot start Pomodoro: Task ID is missing");
+                          return;
+                        }
+                        handleStartPomodoro(taskId);
+                      }}
+                      color={
+                        currentTaskId === (task._id || task.id)
+                          ? "primary"
+                          : "default"
+                      }
+                      size="small"
+                      sx={{ p: { xs: 0.5, sm: 1 } }}
+                    >
+                      {currentTaskId === (task._id || task.id) ? (
                         isRunning ? (
                           <PauseIcon fontSize="small" />
                         ) : (
@@ -495,6 +558,10 @@ const Tasks = () => {
         onClose={handleCloseDialog}
         fullWidth
         maxWidth="sm"
+        disableRestoreFocus
+        disableEnforceFocus
+        keepMounted={false}
+        closeAfterTransition
         PaperProps={{
           sx: { width: { xs: "95%", sm: "auto" }, m: { xs: 1, sm: 2 } },
         }}
@@ -509,6 +576,7 @@ const Tasks = () => {
               onChange={handleChange}
               fullWidth
               size="small"
+              autoFocus
             />
             <TextField
               label={t("tasks.duration")}
@@ -531,6 +599,9 @@ const Tasks = () => {
                     fullWidth: true,
                     size: "small",
                   },
+                  popper: {
+                    disablePortal: true,
+                  },
                 }}
               />
             </LocalizationProvider>
@@ -541,6 +612,11 @@ const Tasks = () => {
                 value={form.status}
                 onChange={handleChange}
                 label={t("tasks.status")}
+                MenuProps={{
+                  disablePortal: true,
+                  disableScrollLock: true,
+                  disableAutoFocusItem: true,
+                }}
               >
                 <MenuItem value="PLANNED">{t("tasks.planned")}</MenuItem>
                 <MenuItem value="IN_PROGRESS">{t("tasks.inProgress")}</MenuItem>

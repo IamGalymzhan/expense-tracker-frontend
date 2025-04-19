@@ -41,6 +41,13 @@ export const expenseService = {
     });
   },
 
+  exportExcel: async (startDate, endDate) => {
+    return apiClient.get("/export/expenses/excel", {
+      params: { startDate, endDate },
+      responseType: "blob",
+    });
+  },
+
   sendReport: async (emailData) => {
     return apiClient.post("/expenses/send-report", emailData);
   },

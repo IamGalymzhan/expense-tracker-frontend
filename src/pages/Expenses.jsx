@@ -320,42 +320,27 @@ const Expenses = () => {
     }
   };
 
-  const handleExportPDF = async () => {
+  const handleExportExcel = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.get(
-        "http://localhost:5000/expenses/export-pdf",
-        {
-          headers,
-          responseType: "blob",
-        }
+      // Calculate first and last day of the selected month
+      const year = new Date().getFullYear();
+      const startDate = dayjs(new Date(year, selectedMonth, 1)).format(
+        "YYYY-MM-DD"
+      );
+      const endDate = dayjs(new Date(year, selectedMonth + 1, 0)).format(
+        "YYYY-MM-DD"
       );
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const response = await expenseService.exportExcel(startDate, endDate);
+      const url = window.URL.createObjectURL(new Blob([response]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "expenses.pdf");
+      link.setAttribute("download", "expenses.xlsx");
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (err) {
-      console.error(t("expenses.errorExportingPDF"), err);
-    }
-  };
-
-  const handleEmailReport = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-      await axios.post(
-        "http://localhost:5000/expenses/send-report",
-        {},
-        { headers }
-      );
-      alert(t("expenses.reportSent"));
-    } catch (err) {
-      console.error(t("expenses.errorSendingEmail"), err);
+      console.error(t("expenses.errorExportingExcel"), err);
     }
   };
 
@@ -573,7 +558,7 @@ const Expenses = () => {
               variant="contained"
               color="primary"
               startIcon={<FileDownloadIcon />}
-              onClick={() => handleExportPDF()}
+              onClick={() => handleExportExcel()}
               fullWidth
               sx={{
                 maxWidth: { sm: 250 },
@@ -585,25 +570,7 @@ const Expenses = () => {
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              {t("expenses.exportPDF")}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<EmailIcon />}
-              onClick={() => handleEmailReport()}
-              fullWidth
-              sx={{
-                maxWidth: { sm: 250 },
-                height: { xs: 45, sm: 40 },
-                bgcolor: "#1a237e",
-                "&:hover": {
-                  bgcolor: "#0d1b60",
-                },
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              }}
-            >
-              {t("expenses.sendEmail")}
+              {t("expenses.exportExcel")}
             </Button>
           </Box>
         </Container>

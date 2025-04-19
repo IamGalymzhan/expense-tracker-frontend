@@ -1,13 +1,10 @@
+import kkTranslations from "./kk.json";
+import ruTranslations from "./ru.json";
+import enTranslations from "./en.json";
+
+// Export translations directly from the JSON files for any direct imports
 export const translations = {
-    kk: {
-      welcome: "Қош келдіңіз!",
-      login: "Кіру",
-      register: "Тіркелу",
-    },
-    ru: {
-      welcome: "Добро пожаловать!",
-      login: "Войти",
-      register: "Регистрация",
-    },
-  };
-  
+  kk: kkTranslations,
+  ru: ruTranslations,
+  en: enTranslations,
+};

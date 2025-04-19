@@ -320,27 +320,27 @@ const Incomes = () => {
     }
   };
 
-  const handleExportPDF = async () => {
+  const handleExportExcel = async () => {
     try {
-      const response = await incomeService.exportPDF();
+      // Calculate first and last day of the selected month
+      const year = new Date().getFullYear();
+      const startDate = dayjs(new Date(year, selectedMonth, 1)).format(
+        "YYYY-MM-DD"
+      );
+      const endDate = dayjs(new Date(year, selectedMonth + 1, 0)).format(
+        "YYYY-MM-DD"
+      );
+
+      const response = await incomeService.exportExcel(startDate, endDate);
       const url = window.URL.createObjectURL(new Blob([response]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "incomes.pdf");
+      link.setAttribute("download", "incomes.xlsx");
       document.body.appendChild(link);
       link.click();
       link.remove();
     } catch (err) {
-      console.error(t("incomes.errorExportingPDF"), err);
-    }
-  };
-
-  const handleEmailReport = async () => {
-    try {
-      await incomeService.sendReport();
-      alert(t("incomes.reportSent"));
-    } catch (err) {
-      console.error(t("incomes.errorSendingEmail"), err);
+      console.error(t("incomes.errorExportingExcel"), err);
     }
   };
 
@@ -555,7 +555,7 @@ const Incomes = () => {
               variant="contained"
               color="primary"
               startIcon={<FileDownloadIcon />}
-              onClick={() => handleExportPDF()}
+              onClick={() => handleExportExcel()}
               fullWidth
               sx={{
                 maxWidth: { sm: 250 },
@@ -567,25 +567,7 @@ const Incomes = () => {
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              {t("incomes.exportPDF")}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<EmailIcon />}
-              onClick={() => handleEmailReport()}
-              fullWidth
-              sx={{
-                maxWidth: { sm: 250 },
-                height: { xs: 45, sm: 40 },
-                bgcolor: "#1a237e",
-                "&:hover": {
-                  bgcolor: "#0d1b60",
-                },
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              }}
-            >
-              {t("incomes.sendEmail")}
+              {t("incomes.exportExcel")}
             </Button>
           </Box>
         </Container>

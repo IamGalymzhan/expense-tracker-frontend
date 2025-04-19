@@ -41,6 +41,13 @@ export const incomeService = {
     });
   },
 
+  exportExcel: async (startDate, endDate) => {
+    return apiClient.get("/export/incomes/excel", {
+      params: { startDate, endDate },
+      responseType: "blob",
+    });
+  },
+
   sendReport: async (emailData) => {
     return apiClient.post("/incomes/send-report", emailData);
   },

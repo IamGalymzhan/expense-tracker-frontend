@@ -388,7 +388,7 @@ const Help = () => {
                     <ListItemIcon>
                       <InfoIcon fontSize="small" />
                     </ListItemIcon>
-                    <ListItemText primary={t("help.exportPDF")} />
+                    <ListItemText primary={t("help.exportExcel")} />
                   </ListItem>
                   <ListItem>
                     <ListItemIcon>

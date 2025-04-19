@@ -23,6 +23,8 @@ import {
   Card,
   CardContent,
   LinearProgress,
+  Divider,
+  InputAdornment,
 } from "@mui/material";
 import { AppBar, Toolbar } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -35,6 +37,8 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import ReplayIcon from "@mui/icons-material/Replay";
 import DeleteIcon from "@mui/icons-material/Delete";
+import TodayIcon from "@mui/icons-material/Today";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { Line, Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -107,7 +111,7 @@ const Tasks = () => {
   const [form, setForm] = useState({
     title: "",
     duration: "",
-    deadline: dayjs(),
+    deadline: null, // Initialize as null to indicate "not set"
     status: "PLANNED",
   });
   const navigate = useNavigate();
@@ -190,8 +194,11 @@ const Tasks = () => {
   // Фильтрация задач по выбранной дате
   const filterTasksByDate = (date, allTasks) => {
     const formattedDate = dayjs(date).format("YYYY-MM-DD");
+    // Only filter tasks that have a deadline
     const filtered = allTasks.filter(
-      (task) => dayjs(task.deadline).format("YYYY-MM-DD") === formattedDate
+      (task) =>
+        task.deadline &&
+        dayjs(task.deadline).format("YYYY-MM-DD") === formattedDate
     );
     setFilteredTasks(filtered);
   };
@@ -207,16 +214,20 @@ const Tasks = () => {
     let filtered = allTasks;
 
     if (newFilter === "today") {
-      filtered = allTasks.filter((task) =>
-        dayjs(task.deadline).isSame(today, "day")
+      filtered = allTasks.filter(
+        (task) => task.deadline && dayjs(task.deadline).isSame(today, "day")
       );
     } else if (newFilter === "week") {
-      filtered = allTasks.filter((task) =>
-        dayjs(task.deadline).isBetween(startOfWeek, endOfWeek, "day", "[]")
+      filtered = allTasks.filter(
+        (task) =>
+          task.deadline &&
+          dayjs(task.deadline).isBetween(startOfWeek, endOfWeek, "day", "[]")
       );
     } else if (newFilter === "month") {
-      filtered = allTasks.filter((task) =>
-        dayjs(task.deadline).isBetween(startOfMonth, endOfMonth, "day", "[]")
+      filtered = allTasks.filter(
+        (task) =>
+          task.deadline &&
+          dayjs(task.deadline).isBetween(startOfMonth, endOfMonth, "day", "[]")
       );
     }
 
@@ -240,12 +251,36 @@ const Tasks = () => {
   // Открытие формы редактирования задачи
   const handleEditTask = (task) => {
     setEditTask(task);
-    setForm({ ...task, deadline: dayjs(task.deadline) });
+    // Handle case when deadline is not set
+    const deadline = task.deadline ? dayjs(task.deadline) : null;
+    const tempTimeInput = deadline
+      ? `${deadline.hour().toString().padStart(2, "0")}:${deadline
+          .minute()
+          .toString()
+          .padStart(2, "0")}`
+      : undefined;
+
+    setForm({
+      ...task,
+      deadline,
+      tempTimeInput,
+    });
     setOpenDialog(true);
   };
 
   // Открытие и закрытие модального окна
-  const handleOpenDialog = () => setOpenDialog(true);
+  const handleOpenDialog = () => {
+    // Reset form when opening for a new task
+    setForm({
+      title: "",
+      duration: "",
+      deadline: null, // Start with no due date
+      status: "PLANNED",
+      tempTimeInput: undefined,
+    });
+    setOpenDialog(true);
+  };
+
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditTask(null);
@@ -256,13 +291,140 @@ const Tasks = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Handle date change
+  const handleDeadlineChange = (newDate) => {
+    // If no date was set or date is being cleared
+    if (!newDate) {
+      setForm({
+        ...form,
+        deadline: null,
+        tempTimeInput: undefined,
+      });
+      return;
+    }
+
+    // If we have an existing date with time, preserve the time
+    let updatedDate = newDate;
+    let tempTime;
+
+    if (form.deadline) {
+      const existingTime = dayjs(form.deadline);
+      updatedDate = newDate
+        .hour(existingTime.hour())
+        .minute(existingTime.minute());
+      tempTime = `${existingTime
+        .hour()
+        .toString()
+        .padStart(2, "0")}:${existingTime
+        .minute()
+        .toString()
+        .padStart(2, "0")}`;
+    } else {
+      // Set a default time (noon) when selecting a date for the first time
+      updatedDate = newDate.hour(12).minute(0);
+      tempTime = "12:00";
+    }
+
+    setForm({
+      ...form,
+      deadline: updatedDate,
+      tempTimeInput: tempTime,
+    });
+  };
+
+  // Handle time change with manual input (24-hour format)
+  const handleTimeInput = (e) => {
+    const timeValue = e.target.value;
+
+    // Allow empty values when field is cleared
+    if (!timeValue) {
+      return;
+    }
+
+    // Don't process further if no date is selected
+    if (!form.deadline) return;
+
+    try {
+      // Allow partial input while typing (user is still typing)
+      // This is a more lenient pattern for real-time validation
+
+      // Handle special case when deleting/backspacing
+      if (e.nativeEvent.inputType === "deleteContentBackward") {
+        setForm({
+          ...form,
+          tempTimeInput: timeValue,
+        });
+        return;
+      }
+
+      // Auto-format input with colon
+      let formattedValue = timeValue;
+
+      // If user types 2 digits without colon, add it automatically
+      if (timeValue.length === 2 && !timeValue.includes(":")) {
+        formattedValue = timeValue + ":";
+        e.target.value = formattedValue; // Update the input field value
+      }
+
+      // Store the partially typed value in form state
+      setForm({
+        ...form,
+        tempTimeInput: formattedValue,
+      });
+
+      // Only update the actual time when input is complete and valid
+      if (/^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/.test(formattedValue)) {
+        const [hours, minutes] = formattedValue
+          .split(":")
+          .map((num) => parseInt(num, 10));
+
+        // Create a copy of the current deadline date and set the time
+        const newDeadline = dayjs(form.deadline)
+          .hour(hours)
+          .minute(minutes)
+          .second(0);
+
+        setForm({
+          ...form,
+          deadline: newDeadline,
+          tempTimeInput: formattedValue,
+        });
+      }
+    } catch (err) {
+      console.error("Invalid time format", err);
+    }
+  };
+
+  // Extract time from deadline for display in the time input field
+  const getTimeString = () => {
+    // If there's a partial input in progress, return that instead
+    if (form.tempTimeInput !== undefined) {
+      return form.tempTimeInput;
+    }
+
+    // Otherwise show the formatted time from the deadline
+    if (!form.deadline) return "";
+    const deadline = dayjs(form.deadline);
+    return `${deadline.hour().toString().padStart(2, "0")}:${deadline
+      .minute()
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   // Обработчик отправки формы
   const handleSubmit = async () => {
     try {
+      // Create payload with the correct deadline field
+      const taskData = {
+        ...form,
+        // Only include deadline if it's set
+        ...(form.deadline && { deadline: dayjs(form.deadline).toISOString() }),
+      };
+
       if (form.id) {
-        await taskService.updateTask(form.id, form);
+        await taskService.updateTask(form.id, taskData);
       } else {
-        await taskService.createTask(form);
+        await taskService.createTask(taskData);
       }
       await taskService.refreshTasks();
       handleCloseDialog();
@@ -346,6 +508,12 @@ const Tasks = () => {
     setTimer(breakTime ? 300 : 1500);
   };
 
+  // Function to format date and time for display
+  const formatDateTime = (dateTime) => {
+    if (!dateTime) return null;
+    return dayjs(dateTime).format("DD.MM.YYYY HH:mm");
+  };
+
   return (
     <Box>
       <TopNav />
@@ -419,16 +587,9 @@ const Tasks = () => {
               >
                 {t("tasks.add")}
               </Button>
-              <TextField
-                label={t("tasks.search")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{ width: { xs: "100%", sm: 200 } }}
-                size="small"
-              />
             </Stack>
 
-            {/* Task Items */}
+            {/* Task Items - Only show due date if it exists */}
             {filteredTasks && filteredTasks.length > 0 ? (
               filteredTasks.map((task) => (
                 <Box
@@ -452,10 +613,15 @@ const Tasks = () => {
                     >
                       {task.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t("tasks.deadline")}:{" "}
-                      {dayjs(task.deadline).format("DD.MM.YYYY")}
-                    </Typography>
+                    {task.deadline ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {t("tasks.deadline")}: {formatDateTime(task.deadline)}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        {t("tasks.noDueDate")}
+                      </Typography>
+                    )}
                   </Box>
                   <Stack
                     direction="row"
@@ -552,82 +718,198 @@ const Tasks = () => {
         </Container>
       </Box>
 
-      {/* Task Dialog */}
+      {/* Enhanced Task Dialog with separate date and time fields */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
         disableRestoreFocus
         disableEnforceFocus
         keepMounted={false}
         closeAfterTransition
         PaperProps={{
-          sx: { width: { xs: "95%", sm: "auto" }, m: { xs: 1, sm: 2 } },
+          sx: {
+            width: { xs: "95%", sm: "90%", md: "80%" },
+            m: { xs: 1, sm: 2 },
+            maxHeight: "90vh",
+            overflow: "auto",
+          },
         }}
       >
-        <DialogTitle>{editTask ? t("tasks.edit") : t("tasks.add")}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label={t("tasks.title")}
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-              autoFocus
-            />
-            <TextField
-              label={t("tasks.duration")}
-              name="duration"
-              type="number"
-              value={form.duration}
-              onChange={handleChange}
-              fullWidth
-              size="small"
-            />
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label={t("tasks.deadline")}
-                value={form.deadline}
-                onChange={(newValue) =>
-                  setForm({ ...form, deadline: newValue })
-                }
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                  },
-                  popper: {
+        <DialogTitle sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}>
+          {editTask ? t("tasks.edit") : t("tasks.add")}
+        </DialogTitle>
+        <DialogContent sx={{ pb: 2 }}>
+          <Grid container spacing={3} sx={{ mt: 0.5 }}>
+            <Grid item xs={12}>
+              <TextField
+                label={t("tasks.title")}
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                fullWidth
+                size="medium"
+                autoFocus
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <TextField
+                label={t("tasks.duration")}
+                name="duration"
+                type="number"
+                value={form.duration}
+                onChange={handleChange}
+                fullWidth
+                size="medium"
+                InputProps={{
+                  endAdornment: (
+                    <Typography variant="caption" sx={{ ml: 1 }}>
+                      {t("tasks.minutes")}
+                    </Typography>
+                  ),
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <FormControl fullWidth size="medium">
+                <InputLabel>{t("tasks.status")}</InputLabel>
+                <Select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  label={t("tasks.status")}
+                  MenuProps={{
                     disablePortal: true,
+                    disableScrollLock: true,
+                    disableAutoFocusItem: true,
+                  }}
+                >
+                  <MenuItem value="PLANNED">{t("tasks.planned")}</MenuItem>
+                  <MenuItem value="IN_PROGRESS">
+                    {t("tasks.inProgress")}
+                  </MenuItem>
+                  <MenuItem value="COMPLETED">{t("tasks.completed")}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Typography
+                variant="subtitle1"
+                sx={{ mb: 2, display: "flex", alignItems: "center" }}
+              >
+                <TodayIcon sx={{ mr: 1 }} /> {t("tasks.deadlineSection")}
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label={t("tasks.deadlineCalendar")}
+                  value={form.deadline}
+                  onChange={handleDeadlineChange}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      size: "medium",
+                      placeholder: t("tasks.selectDate"),
+                    },
+                    popper: {
+                      disablePortal: false,
+                      placement: "bottom-start",
+                      modifiers: [
+                        {
+                          name: "offset",
+                          options: {
+                            offset: [0, 8],
+                          },
+                        },
+                      ],
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label={t("tasks.deadlineTime")}
+                placeholder="HH:MM"
+                value={getTimeString()}
+                onChange={handleTimeInput}
+                disabled={!form.deadline}
+                fullWidth
+                size="medium"
+                inputProps={{
+                  maxLength: 5,
+                  pattern: "[0-9]{2}:[0-9]{2}",
+                  inputMode: "numeric",
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <AccessTimeIcon
+                        color={form.deadline ? "primary" : "disabled"}
+                      />
+                    </InputAdornment>
+                  ),
+                }}
+                helperText={
+                  form.deadline ? t("tasks.timeFormat") : t("tasks.noDueDate")
+                }
+                FormHelperTextProps={{
+                  sx: {
+                    color:
+                      form.tempTimeInput &&
+                      !/^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/.test(
+                        form.tempTimeInput
+                      )
+                        ? "error.main"
+                        : "text.secondary",
                   },
                 }}
               />
-            </LocalizationProvider>
-            <FormControl fullWidth size="small">
-              <InputLabel>{t("tasks.status")}</InputLabel>
-              <Select
-                name="status"
-                value={form.status}
-                onChange={handleChange}
-                label={t("tasks.status")}
-                MenuProps={{
-                  disablePortal: true,
-                  disableScrollLock: true,
-                  disableAutoFocusItem: true,
-                }}
-              >
-                <MenuItem value="PLANNED">{t("tasks.planned")}</MenuItem>
-                <MenuItem value="IN_PROGRESS">{t("tasks.inProgress")}</MenuItem>
-                <MenuItem value="COMPLETED">{t("tasks.completed")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
+            </Grid>
+
+            {form.deadline && (
+              <Grid item xs={12}>
+                <Box
+                  sx={{
+                    bgcolor: "background.paper",
+                    p: 2,
+                    borderRadius: 1,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1,
+                  }}
+                >
+                  <AccessTimeIcon color="primary" />
+                  <Typography>
+                    {t("tasks.selectedDateTime")}:{" "}
+                    {formatDateTime(form.deadline)}
+                  </Typography>
+                </Box>
+              </Grid>
+            )}
+          </Grid>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleCloseDialog}>{t("common.cancel")}</Button>
-          <Button onClick={handleSubmit} variant="contained">
+        <DialogActions sx={{ px: 3, pb: 3, pt: 1 }}>
+          <Button onClick={handleCloseDialog} variant="outlined" size="large">
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            size="large"
+            sx={{ minWidth: 100 }}
+          >
             {t("common.save")}
           </Button>
         </DialogActions>

@@ -6,10 +6,11 @@ import {
   Box,
   Menu,
   MenuItem,
+  useTheme,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link as RouterLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import HelpIcon from "@mui/icons-material/Help";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useTranslation } from "react-i18next";
@@ -21,10 +22,13 @@ import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { ThemeContext } from "../context/ThemeContext";
 
 const TopNav = () => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
+  const { themeMode } = useContext(ThemeContext);
 
   const menuItems = [
     {
@@ -76,7 +80,7 @@ const TopNav = () => {
   };
 
   return (
-    <AppBar position="static" sx={{ bgcolor: "#1a237e" }}>
+    <AppBar position="static" sx={{ bgcolor: theme.palette.primary.main }}>
       <Toolbar>
         <IconButton
           color="inherit"
@@ -101,13 +105,16 @@ const TopNav = () => {
           }}
           PaperProps={{
             sx: {
-              bgcolor: "#1a237e",
-              color: "white",
+              bgcolor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
               mt: 0.5,
               "& .MuiMenuItem-root": {
                 py: 1.5,
                 "&:hover": {
-                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  bgcolor:
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "rgba(0, 0, 0, 0.04)",
                 },
               },
             },

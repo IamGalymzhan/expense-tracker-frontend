@@ -11,6 +11,7 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
+  useTheme,
 } from "@mui/material";
 import TopNav from "../components/TopNav";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -23,6 +24,7 @@ import { useTranslation } from "react-i18next";
 
 const Tips = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const timeManagementTips = [
     {
@@ -90,7 +92,7 @@ const Tips = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor: theme.palette.background.default,
           minHeight: "100vh",
           fontFamily:
             "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
@@ -103,7 +105,7 @@ const Tips = () => {
             sx={{
               fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
               mb: { xs: 2, sm: 3 },
-              color: "#000000",
+              color: theme.palette.text.primary,
               fontWeight: 500,
               fontFamily:
                 "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
@@ -120,8 +122,8 @@ const Tips = () => {
               mb: { xs: 2, sm: 3, md: 4 },
               width: "100%",
               borderRadius: 2,
-              bgcolor: "white",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
               overflow: "hidden",
             }}
           >
@@ -174,10 +176,13 @@ const Tips = () => {
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     sx={{
-                      bgcolor: "#f8fafc",
+                      bgcolor:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.background.default
+                          : "#f8fafc",
                       borderRadius: 1,
                       "&:hover": {
-                        bgcolor: "#f1f5f9",
+                        bgcolor: theme.palette.action.hover,
                       },
                     }}
                   >
@@ -185,7 +190,7 @@ const Tips = () => {
                       variant="subtitle1"
                       sx={{
                         fontWeight: 500,
-                        color: "#000000",
+                        color: theme.palette.text.primary,
                         fontFamily:
                           "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
                       }}
@@ -196,7 +201,7 @@ const Tips = () => {
                   <AccordionDetails>
                     <Typography
                       sx={{
-                        color: "text.secondary",
+                        color: theme.palette.text.secondary,
                         lineHeight: 1.6,
                         fontFamily:
                           "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
@@ -216,11 +221,12 @@ const Tips = () => {
                                 sx={{
                                   fontSize: 8,
                                   mt: 1,
-                                  color: "#000000",
+                                  color: theme.palette.text.primary,
                                 }}
                               />
                               <Typography
                                 sx={{
+                                  color: theme.palette.text.secondary,
                                   fontFamily:
                                     "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
                                 }}
@@ -229,7 +235,11 @@ const Tips = () => {
                               </Typography>
                             </Box>
                           ) : (
-                            <Typography>{paragraph}</Typography>
+                            <Typography
+                              sx={{ color: theme.palette.text.secondary }}
+                            >
+                              {paragraph}
+                            </Typography>
                           )}
                         </Box>
                       ))}
@@ -243,7 +253,7 @@ const Tips = () => {
               sx={{
                 mt: 2,
                 display: "block",
-                color: "text.secondary",
+                color: theme.palette.text.secondary,
                 p: { xs: 1.5, sm: 2, md: 3 },
                 pt: 0,
               }}
@@ -253,7 +263,10 @@ const Tips = () => {
                 href="https://vc.ru/life/991598-99-sposobov-sekonomit-vremya-chtoby-potratit-ego-so-smyslom"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#1a237e", textDecoration: "none" }}
+                style={{
+                  color: theme.palette.primary.main,
+                  textDecoration: "none",
+                }}
               >
                 https://vc.ru/life/991598-99-sposobov-sekonomit-vremya-chtoby-potratit-ego-so-smyslom
               </a>
@@ -268,8 +281,8 @@ const Tips = () => {
               mb: { xs: 2, sm: 3, md: 4 },
               width: "100%",
               borderRadius: 2,
-              bgcolor: "white",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
               overflow: "hidden",
             }}
           >
@@ -322,10 +335,13 @@ const Tips = () => {
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     sx={{
-                      bgcolor: "#f8fafc",
+                      bgcolor:
+                        theme.palette.mode === "dark"
+                          ? theme.palette.background.default
+                          : "#f8fafc",
                       borderRadius: 1,
                       "&:hover": {
-                        bgcolor: "#f1f5f9",
+                        bgcolor: theme.palette.action.hover,
                       },
                     }}
                   >
@@ -333,7 +349,7 @@ const Tips = () => {
                       variant="subtitle1"
                       sx={{
                         fontWeight: 500,
-                        color: "#000000",
+                        color: theme.palette.text.primary,
                         fontFamily:
                           "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
                       }}
@@ -344,7 +360,7 @@ const Tips = () => {
                   <AccordionDetails>
                     <Typography
                       sx={{
-                        color: "text.secondary",
+                        color: theme.palette.text.secondary,
                         lineHeight: 1.6,
                         fontFamily:
                           "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
@@ -364,11 +380,12 @@ const Tips = () => {
                                 sx={{
                                   fontSize: 8,
                                   mt: 1,
-                                  color: "#000000",
+                                  color: theme.palette.text.primary,
                                 }}
                               />
                               <Typography
                                 sx={{
+                                  color: theme.palette.text.secondary,
                                   fontFamily:
                                     "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",
                                 }}
@@ -377,7 +394,11 @@ const Tips = () => {
                               </Typography>
                             </Box>
                           ) : (
-                            <Typography>{paragraph}</Typography>
+                            <Typography
+                              sx={{ color: theme.palette.text.secondary }}
+                            >
+                              {paragraph}
+                            </Typography>
                           )}
                         </Box>
                       ))}
@@ -391,7 +412,7 @@ const Tips = () => {
               sx={{
                 mt: 2,
                 display: "block",
-                color: "text.secondary",
+                color: theme.palette.text.secondary,
                 p: { xs: 1.5, sm: 2, md: 3 },
                 pt: 0,
               }}
@@ -401,7 +422,10 @@ const Tips = () => {
                 href="https://financer.kz/sberezheniya/sovety-po-ekonomii/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#1a237e", textDecoration: "none" }}
+                style={{
+                  color: theme.palette.primary.main,
+                  textDecoration: "none",
+                }}
               >
                 https://financer.kz/sberezheniya/sovety-po-ekonomii/
               </a>

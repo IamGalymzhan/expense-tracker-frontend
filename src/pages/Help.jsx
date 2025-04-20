@@ -29,6 +29,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import TopNav from "../components/TopNav";
 import { useTranslation } from "react-i18next";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 
 // Custom TabPanel component
 function TabPanel(props) {
@@ -57,7 +58,7 @@ function a11yProps(index) {
 
 const Help = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
+  const theme = useMuiTheme();
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (event, newValue) => {
@@ -65,21 +66,40 @@ const Help = () => {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+    <Box>
       <TopNav />
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: { xs: 1, sm: 2, md: 3 },
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? theme.palette.background.default
+              : "#f8fafc",
+          minHeight: "100vh",
+        }}
+      >
+        <Container maxWidth="lg">
           <Typography
             variant="h4"
             component="h1"
             gutterBottom
-            fontWeight="bold"
+            sx={{ fontWeight: "bold", mb: 3 }}
           >
             {t("help.title")}
           </Typography>
-          <Typography variant="body1" paragraph>
-            {t("help.welcome")}
-          </Typography>
+
+          <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+            <Typography
+              variant="h5"
+              component="h2"
+              gutterBottom
+              fontWeight="bold"
+            >
+              {t("help.welcome")}
+            </Typography>
+          </Paper>
 
           <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
             <Tabs
@@ -726,7 +746,7 @@ const Help = () => {
               </AccordionDetails>
             </Accordion>
           </TabPanel>
-        </Paper>
+        </Container>
 
         {/* Frequently Asked Questions */}
         <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
@@ -802,7 +822,7 @@ const Help = () => {
             {t("help.supportEmail")}: support@expensetracker.com
           </Typography>
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 };

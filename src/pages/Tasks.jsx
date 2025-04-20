@@ -25,6 +25,7 @@ import {
   LinearProgress,
   Divider,
   InputAdornment,
+  useTheme,
 } from "@mui/material";
 import { AppBar, Toolbar } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -102,6 +103,7 @@ const chartOptions = {
 
 const Tasks = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const [tasks, setTasks] = useState([]); // Список всех задач
   const [editTask, setEditTask] = useState(null);
@@ -522,7 +524,7 @@ const Tasks = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor: theme.palette.background.default,
           minHeight: "100vh",
         }}
       >
@@ -533,7 +535,7 @@ const Tasks = () => {
             sx={{
               fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
               mb: { xs: 2, sm: 3 },
-              color: "#1a237e",
+              color: theme.palette.text.primary,
             }}
           >
             {t("tasks.title")}
@@ -557,6 +559,8 @@ const Tasks = () => {
                     px: { xs: 1, sm: 2 },
                     py: 1,
                     fontSize: { xs: "0.8rem", sm: "0.875rem" },
+                    color: theme.palette.text.primary,
+                    borderColor: theme.palette.divider,
                   },
                 }}
               >
@@ -571,7 +575,15 @@ const Tasks = () => {
           </Box>
 
           {/* Task List */}
-          <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 4 }}>
+          <Paper
+            sx={{
+              p: { xs: 2, sm: 3 },
+              mb: 4,
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
+              borderRadius: 2,
+            }}
+          >
             <Stack
               direction={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
@@ -583,7 +595,14 @@ const Tasks = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={handleOpenDialog}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
+                sx={{
+                  width: { xs: "100%", sm: "auto" },
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
+                  "&:hover": {
+                    bgcolor: theme.palette.primary.dark,
+                  },
+                }}
               >
                 {t("tasks.add")}
               </Button>
@@ -597,19 +616,23 @@ const Tasks = () => {
                   sx={{
                     p: { xs: 1.5, sm: 2 },
                     mb: 2,
-                    border: "1px solid #e0e0e0",
+                    border: `1px solid ${theme.palette.divider}`,
                     borderRadius: 1,
                     display: "flex",
                     flexDirection: { xs: "column", sm: "row" },
                     justifyContent: "space-between",
                     alignItems: { xs: "flex-start", sm: "center" },
                     gap: { xs: 1, sm: 0 },
+                    bgcolor: theme.palette.background.paper,
                   }}
                 >
                   <Box sx={{ width: { xs: "100%", sm: "auto" } }}>
                     <Typography
                       variant="h6"
-                      sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                      sx={{
+                        fontSize: { xs: "1rem", sm: "1.25rem" },
+                        color: theme.palette.text.primary,
+                      }}
                     >
                       {task.title}
                     </Typography>
@@ -709,38 +732,90 @@ const Tasks = () => {
               ))
             ) : (
               <Typography
-                sx={{ textAlign: "center", my: 3, color: "text.secondary" }}
+                sx={{
+                  textAlign: "center",
+                  my: 3,
+                  color: theme.palette.text.secondary,
+                }}
               >
                 {t("tasks.noTasks")}
               </Typography>
             )}
           </Paper>
+
+          {/* Pomodoro Timer */}
+          <Paper
+            sx={{
+              p: { xs: 2, sm: 3 },
+              mb: 4,
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h6" gutterBottom color="text.primary">
+              {t("tasks.pomodoroTimer")}
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+            >
+              {Math.floor(timer / 60)}:
+              {(timer % 60).toString().padStart(2, "0")}
+            </Typography>
+            <IconButton
+              onClick={handleToggleTimer}
+              size="small"
+              sx={{ p: { xs: 0.5, sm: 1 } }}
+            >
+              {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+            <IconButton
+              onClick={handleResetTimer}
+              size="small"
+              sx={{ p: { xs: 0.5, sm: 1 } }}
+            >
+              <ReplayIcon />
+            </IconButton>
+          </Paper>
+
+          {/* Task Statistics Section */}
+          <Paper
+            sx={{
+              p: { xs: 2, sm: 3 },
+              mb: 4,
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
+              borderRadius: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: theme.palette.text.primary }}
+            >
+              {t("tasks.statistics")}
+            </Typography>
+            {/* ... Statistics content ... */}
+          </Paper>
         </Container>
       </Box>
 
-      {/* Enhanced Task Dialog with separate date and time fields */}
+      {/* Add/Edit Task Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         fullWidth
-        maxWidth="md"
-        disableRestoreFocus
-        disableEnforceFocus
-        keepMounted={false}
-        closeAfterTransition
         PaperProps={{
           sx: {
-            width: { xs: "95%", sm: "90%", md: "80%" },
-            m: { xs: 1, sm: 2 },
-            maxHeight: "90vh",
-            overflow: "auto",
+            bgcolor: theme.palette.background.paper,
           },
         }}
       >
-        <DialogTitle sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}>
-          {editTask ? t("tasks.edit") : t("tasks.add")}
+        <DialogTitle sx={{ color: theme.palette.text.primary }}>
+          {editTask ? t("tasks.editTask") : t("tasks.addNewTask")}
         </DialogTitle>
-        <DialogContent sx={{ pb: 2 }}>
+        <DialogContent>
           <Grid container spacing={3} sx={{ mt: 0.5 }}>
             <Grid item xs={12}>
               <TextField
@@ -900,60 +975,15 @@ const Tasks = () => {
             )}
           </Grid>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3, pt: 1 }}>
-          <Button onClick={handleCloseDialog} variant="outlined" size="large">
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="inherit">
             {t("common.cancel")}
           </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            size="large"
-            sx={{ minWidth: 100 }}
-          >
+          <Button onClick={handleSubmit} variant="contained" color="primary">
             {t("common.save")}
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Pomodoro Timer */}
-      {currentTaskId && (
-        <Box
-          sx={{
-            position: "fixed",
-            bottom: { xs: 10, sm: 20 },
-            right: { xs: 10, sm: 20 },
-            bgcolor: "white",
-            p: { xs: 1.5, sm: 2 },
-            borderRadius: 2,
-            boxShadow: 3,
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 1, sm: 2 },
-            zIndex: 1100,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
-          >
-            {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, "0")}
-          </Typography>
-          <IconButton
-            onClick={handleToggleTimer}
-            size="small"
-            sx={{ p: { xs: 0.5, sm: 1 } }}
-          >
-            {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
-          </IconButton>
-          <IconButton
-            onClick={handleResetTimer}
-            size="small"
-            sx={{ p: { xs: 0.5, sm: 1 } }}
-          >
-            <ReplayIcon />
-          </IconButton>
-        </Box>
-      )}
     </Box>
   );
 };

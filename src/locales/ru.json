@@ -11,13 +11,16 @@
     "language": "Язык",
     "kazakh": "Қазақша",
     "russian": "Русский",
+    "english": "Английский",
     "passwordRequired": "Пожалуйста, заполните оба поля для изменения пароля.",
     "passwordChanged": "Пароль успешно изменен!",
     "passwordChangeError": "Ошибка изменения пароля. Проверьте текущий пароль.",
     "changePassword": "Изменить пароль",
     "currentPassword": "Текущий пароль",
     "newPassword": "Новый пароль",
-    "updatePassword": "Обновить пароль"
+    "updatePassword": "Обновить пароль",
+    "theme": "Тема",
+    "enableDarkMode": "Включить темную тему"
   },
   "auth": {
     "login": "Войти",

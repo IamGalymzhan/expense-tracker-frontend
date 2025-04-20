@@ -33,6 +33,7 @@ import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { achievementService } from "../services/achievementService";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 
 const AchievementModal = ({ achievement, open, onClose }) => {
   const { t } = useTranslation();
@@ -507,6 +508,7 @@ const Achievements = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const theme = useMuiTheme();
   const [achievements, setAchievements] = useState({ financial: [], time: [] });
   const [achievementProgress, setAchievementProgress] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -639,7 +641,10 @@ const Achievements = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? theme.palette.background.default
+              : "#f8fafc",
           minHeight: "100vh",
           fontFamily:
             "'Roboto', 'Noto Sans', 'Open Sans', 'Inter', 'Source Sans Pro', sans-serif",

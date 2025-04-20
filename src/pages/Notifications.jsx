@@ -15,6 +15,7 @@ import {
   Alert,
   CircularProgress,
   Snackbar,
+  LinearProgress,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -27,6 +28,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AlarmIcon from "@mui/icons-material/Alarm";
 import { notificationService } from "../services";
+import { useTheme } from "@mui/material/styles";
 
 // Extend dayjs with relative time plugin
 dayjs.extend(relativeTime);
@@ -41,6 +43,9 @@ const Notifications = () => {
     message: "",
     severity: "success",
   });
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const theme = useTheme();
 
   useEffect(() => {
     fetchNotifications();
@@ -141,148 +146,134 @@ const Notifications = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? theme.palette.background.default
+              : "#f8fafc",
           minHeight: "100vh",
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="md" sx={{ py: 4 }}>
           <Typography
             variant="h4"
+            component="h1"
             gutterBottom
-            sx={{
-              fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
-              mb: { xs: 2, sm: 3 },
-              color: "#1a237e",
-            }}
+            sx={{ fontWeight: "bold", mb: 3 }}
           >
             {t("notifications.title")}
           </Typography>
 
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 1.5, sm: 2 },
-              bgcolor: "#ffffff",
-              borderRadius: 2,
-              mb: 3,
-            }}
-          >
-            {loading ? (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                py={4}
-              >
-                <CircularProgress />
-              </Box>
-            ) : error ? (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            ) : notifications.length === 0 ? (
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                py={4}
-              >
-                <NotificationsIcon
-                  sx={{ fontSize: 60, color: "text.secondary", mb: 2 }}
-                />
-                <Typography variant="h6" color="text.secondary">
-                  {t("notifications.noNotifications")}
-                </Typography>
-              </Box>
-            ) : (
-              <List>
-                {Array.isArray(notifications) &&
-                  notifications.map((notification, index) => (
-                    <Box key={notification.id || index}>
-                      {index > 0 && <Divider component="li" />}
-                      <ListItem
-                        alignItems="flex-start"
-                        sx={{
-                          bgcolor: notification.read
-                            ? "inherit"
-                            : "rgba(25, 118, 210, 0.05)",
-                          py: 2,
-                        }}
-                      >
-                        <Box mr={2} mt={0.5}>
-                          {getNotificationIcon(notification.type)}
-                        </Box>
-                        <ListItemText
-                          primary={
-                            <Box
+          {/* Notifications list */}
+          {loading ? (
+            <Box sx={{ width: "100%", mt: 4 }}>
+              <LinearProgress />
+            </Box>
+          ) : error ? (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          ) : notifications.length === 0 ? (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              py={4}
+            >
+              <NotificationsIcon
+                sx={{ fontSize: 60, color: "text.secondary", mb: 2 }}
+              />
+              <Typography variant="h6" color="text.secondary">
+                {t("notifications.noNotifications")}
+              </Typography>
+            </Box>
+          ) : (
+            <List>
+              {Array.isArray(notifications) &&
+                notifications.map((notification, index) => (
+                  <Box key={notification.id || index}>
+                    {index > 0 && <Divider component="li" />}
+                    <ListItem
+                      alignItems="flex-start"
+                      sx={{
+                        bgcolor: notification.read
+                          ? "inherit"
+                          : "rgba(25, 118, 210, 0.05)",
+                        py: 2,
+                      }}
+                    >
+                      <Box mr={2} mt={0.5}>
+                        {getNotificationIcon(notification.type)}
+                      </Box>
+                      <ListItemText
+                        primary={
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="body1"
+                              component="span"
                               sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
+                                fontWeight: notification.read
+                                  ? "normal"
+                                  : "bold",
                               }}
                             >
-                              <Typography
-                                variant="body1"
-                                component="span"
-                                sx={{
-                                  fontWeight: notification.read
-                                    ? "normal"
-                                    : "bold",
-                                }}
-                              >
-                                {notification.message}
-                              </Typography>
-                              {!notification.read && (
-                                <Chip
-                                  label={t("notifications.new")}
-                                  size="small"
-                                  color="primary"
-                                />
-                              )}
-                            </Box>
-                          }
-                          secondary={
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="text.secondary"
-                            >
-                              {dayjs(notification.createdAt).fromNow()}
+                              {notification.message}
                             </Typography>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          <Grid container spacing={1}>
                             {!notification.read && (
-                              <Grid item>
-                                <IconButton
-                                  edge="end"
-                                  aria-label="mark as read"
-                                  onClick={() =>
-                                    handleMarkAsRead(notification.id)
-                                  }
-                                >
-                                  <DoneIcon />
-                                </IconButton>
-                              </Grid>
+                              <Chip
+                                label={t("notifications.new")}
+                                size="small"
+                                color="primary"
+                              />
                             )}
+                          </Box>
+                        }
+                        secondary={
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            color="text.secondary"
+                          >
+                            {dayjs(notification.createdAt).fromNow()}
+                          </Typography>
+                        }
+                      />
+                      <ListItemSecondaryAction>
+                        <Grid container spacing={1}>
+                          {!notification.read && (
                             <Grid item>
                               <IconButton
                                 edge="end"
-                                aria-label="delete"
-                                onClick={() => handleDelete(notification.id)}
+                                aria-label="mark as read"
+                                onClick={() =>
+                                  handleMarkAsRead(notification.id)
+                                }
                               >
-                                <DeleteIcon />
+                                <DoneIcon />
                               </IconButton>
                             </Grid>
+                          )}
+                          <Grid item>
+                            <IconButton
+                              edge="end"
+                              aria-label="delete"
+                              onClick={() => handleDelete(notification.id)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
                           </Grid>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    </Box>
-                  ))}
-              </List>
-            )}
-          </Paper>
+                        </Grid>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  </Box>
+                ))}
+            </List>
+          )}
         </Container>
       </Box>
 

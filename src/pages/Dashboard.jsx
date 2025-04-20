@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, useContext } from "react";
 import {
   Container,
   Typography,
@@ -18,6 +18,7 @@ import {
   TextField,
   Select,
   MenuItem,
+  useTheme,
 } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Pie, Line } from "react-chartjs-2";
@@ -103,6 +104,7 @@ const getPeriodForApi = (uiPeriod, t) => {
 
 const Dashboard = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [incomeExpenseStats, setIncomeExpenseStats] = useState(null);
@@ -688,14 +690,14 @@ const Dashboard = () => {
   }, [selectedTimePeriod]);
 
   return (
-    <Box>
+    <Box sx={{ minHeight: "100vh", bgcolor: theme.palette.background.default }}>
       <TopNav />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor: theme.palette.background.default,
           minHeight: "100vh",
         }}
       >
@@ -706,7 +708,7 @@ const Dashboard = () => {
             sx={{
               fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
               mb: { xs: 2, sm: 3 },
-              color: "#1a237e",
+              color: theme.palette.primary.main,
             }}
           >
             {t("dashboard.title")}
@@ -723,9 +725,9 @@ const Dashboard = () => {
               alignItems: "center",
               gap: { xs: 1, sm: 2 },
               textAlign: { xs: "center", sm: "left" },
-              bgcolor: "white",
+              bgcolor: theme.palette.background.paper,
               borderRadius: 2,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: theme.shadows[1],
             }}
           >
             <Avatar
@@ -771,9 +773,9 @@ const Dashboard = () => {
             sx={{
               p: { xs: 1.5, sm: 2, md: 3 },
               mb: { xs: 2, sm: 3, md: 4 },
-              bgcolor: "white",
+              bgcolor: theme.palette.background.paper,
               borderRadius: 2,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: theme.shadows[1],
             }}
           >
             <Box
@@ -819,9 +821,9 @@ const Dashboard = () => {
             sx={{
               p: { xs: 1.5, sm: 2, md: 3 },
               mb: { xs: 2, sm: 3, md: 4 },
-              bgcolor: "white",
+              bgcolor: theme.palette.background.paper,
               borderRadius: 2,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: theme.shadows[1],
             }}
           >
             <Typography
@@ -829,7 +831,7 @@ const Dashboard = () => {
               gutterBottom
               sx={{
                 fontSize: { xs: "1.1rem", sm: "1.25rem" },
-                color: "#000000",
+                color: theme.palette.text.primary,
                 fontWeight: 500,
               }}
             >
@@ -890,7 +892,7 @@ const Dashboard = () => {
                       sx={{
                         p: { xs: 1.5, sm: 2 },
                         height: { xs: 400, sm: 450 },
-                        bgcolor: "#f8fafc",
+                        bgcolor: theme.palette.background.paper,
                         borderRadius: 2,
                       }}
                     >
@@ -959,7 +961,7 @@ const Dashboard = () => {
                       sx={{
                         p: { xs: 1.5, sm: 2 },
                         height: { xs: 400, sm: 450 },
-                        bgcolor: "#f8fafc",
+                        bgcolor: theme.palette.background.paper,
                         borderRadius: 2,
                       }}
                     >
@@ -1032,7 +1034,7 @@ const Dashboard = () => {
                       sx={{
                         p: { xs: 1.5, sm: 2 },
                         height: { xs: 400, sm: 450 },
-                        bgcolor: "#f8fafc",
+                        bgcolor: theme.palette.background.paper,
                         borderRadius: 2,
                       }}
                     >
@@ -1097,7 +1099,7 @@ const Dashboard = () => {
                     sx={{
                       fontSize: { xs: "1.1rem", sm: "1.25rem" },
                       mb: { xs: 1, sm: 0 },
-                      color: "#000000",
+                      color: theme.palette.text.primary,
                       fontWeight: 500,
                     }}
                   >
@@ -1145,7 +1147,7 @@ const Dashboard = () => {
                         sx={{
                           p: { xs: 1.5, sm: 2 },
                           height: { xs: 150, sm: 200 },
-                          bgcolor: "#f8fafc",
+                          bgcolor: theme.palette.background.paper,
                           borderRadius: 2,
                         }}
                       >
@@ -1169,7 +1171,7 @@ const Dashboard = () => {
                         sx={{
                           p: { xs: 1.5, sm: 2 },
                           height: { xs: 150, sm: 200 },
-                          bgcolor: "#f8fafc",
+                          bgcolor: theme.palette.background.paper,
                           borderRadius: 2,
                         }}
                       >
@@ -1200,7 +1202,7 @@ const Dashboard = () => {
                         sx={{
                           p: { xs: 1.5, sm: 2 },
                           height: { xs: 150, sm: 200 },
-                          bgcolor: "#f8fafc",
+                          bgcolor: theme.palette.background.paper,
                           borderRadius: 2,
                         }}
                       >
@@ -1224,7 +1226,7 @@ const Dashboard = () => {
                         sx={{
                           p: { xs: 1.5, sm: 2 },
                           height: { xs: 150, sm: 200 },
-                          bgcolor: "#f8fafc",
+                          bgcolor: theme.palette.background.paper,
                           borderRadius: 2,
                         }}
                       >
@@ -1274,9 +1276,10 @@ const Dashboard = () => {
               disabled={isLoadingPdf}
               sx={{
                 minWidth: { xs: "100%", sm: 200 },
-                bgcolor: "#1a237e",
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
                 "&:hover": {
-                  bgcolor: "#0d1b60",
+                  bgcolor: theme.palette.primary.dark,
                 },
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}

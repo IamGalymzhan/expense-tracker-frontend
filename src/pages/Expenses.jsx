@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   Container,
   Typography,
@@ -25,6 +25,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  useTheme,
 } from "@mui/material";
 import { Bar, Line } from "react-chartjs-2";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -140,6 +141,8 @@ const Expenses = () => {
     t("dashboard.november"),
     t("dashboard.december"),
   ];
+
+  const theme = useTheme();
 
   useEffect(() => {
     fetchExpenses();
@@ -352,7 +355,7 @@ const Expenses = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor: theme.palette.background.default,
           minHeight: "100vh",
         }}
       >
@@ -363,7 +366,7 @@ const Expenses = () => {
             sx={{
               fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
               mb: { xs: 2, sm: 3 },
-              color: "#000000",
+              color: theme.palette.text.primary,
               fontWeight: 500,
             }}
           >
@@ -378,8 +381,8 @@ const Expenses = () => {
               mb: { xs: 2, sm: 3, md: 4 },
               width: "100%",
               borderRadius: 2,
-              bgcolor: "white",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
             }}
           >
             <Box
@@ -397,7 +400,7 @@ const Expenses = () => {
                 sx={{
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
                   textAlign: { xs: "center", sm: "left" },
-                  color: "#000000",
+                  color: theme.palette.text.primary,
                   fontWeight: 500,
                 }}
               >
@@ -455,8 +458,8 @@ const Expenses = () => {
               p: { xs: 1.5, sm: 2, md: 3 },
               width: "100%",
               borderRadius: 2,
-              bgcolor: "white",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
+              boxShadow: theme.shadows[1],
               mb: { xs: 3, sm: 4 },
               overflowX: "auto",
             }}
@@ -476,7 +479,7 @@ const Expenses = () => {
                 sx={{
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
                   textAlign: { xs: "center", sm: "left" },
-                  color: "#000000",
+                  color: theme.palette.text.primary,
                   fontWeight: 500,
                 }}
               >
@@ -550,45 +553,32 @@ const Expenses = () => {
               gap: { xs: 2, sm: 2 },
               justifyContent: "center",
               mt: { xs: 2, sm: 4 },
-              mb: { xs: 2, sm: 4 },
-              width: "100%",
+              mb: { xs: 3, sm: 4 },
             }}
           >
             <Button
               variant="contained"
-              color="primary"
               startIcon={<FileDownloadIcon />}
-              onClick={() => handleExportExcel()}
-              fullWidth
+              onClick={handleExportExcel}
               sx={{
-                maxWidth: { sm: 250 },
-                height: { xs: 45, sm: 40 },
-                bgcolor: "#1a237e",
+                minWidth: { xs: "100%", sm: 180 },
+                bgcolor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
                 "&:hover": {
-                  bgcolor: "#0d1b60",
+                  bgcolor: theme.palette.primary.dark,
                 },
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              {t("expenses.exportExcel")}
+              {t("expenses.exportToExcel")}
             </Button>
           </Box>
         </Container>
       </Box>
 
       {/* Add/Edit Expense Dialog */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          },
-        }}
-      >
-        <DialogTitle>
-          {form.id ? t("expenses.edit") : t("expenses.addNew")}
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth>
+        <DialogTitle sx={{ color: theme.palette.text.primary }}>
+          {form.id ? t("expenses.editExpense") : t("expenses.addExpense")}
         </DialogTitle>
         <DialogContent>
           <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
@@ -648,21 +638,11 @@ const Expenses = () => {
             rows={2}
           />
         </DialogContent>
-        <DialogActions sx={{ p: 2, gap: 1 }}>
-          <Button
-            onClick={handleCloseDialog}
-            fullWidth
-            variant="outlined"
-            sx={{ height: { xs: 45, sm: 40 } }}
-          >
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="inherit">
             {t("common.cancel")}
           </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            fullWidth
-            sx={{ height: { xs: 45, sm: 40 } }}
-          >
+          <Button onClick={handleSubmit} color="primary" variant="contained">
             {t("common.save")}
           </Button>
         </DialogActions>

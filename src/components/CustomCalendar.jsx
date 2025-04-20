@@ -9,6 +9,7 @@ import {
   ListItem,
   ListItemText,
   Chip,
+  useTheme,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -37,6 +38,8 @@ const MONTHS = [
 ];
 
 const TaskModal = ({ open, onClose, date, tasks, t }) => {
+  const theme = useTheme();
+
   return (
     <Modal open={open} onClose={onClose} aria-labelledby="task-modal-title">
       <Box
@@ -46,7 +49,7 @@ const TaskModal = ({ open, onClose, date, tasks, t }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: { xs: "90%", sm: 400 },
-          bgcolor: "background.paper",
+          bgcolor: theme.palette.background.paper,
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
@@ -96,6 +99,7 @@ const TaskModal = ({ open, onClose, date, tasks, t }) => {
 
 const CustomCalendar = ({ tasks = [], onDateSelect }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -206,9 +210,9 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
       elevation={0}
       sx={{
         p: { xs: 1.5, sm: 3 },
-        backgroundColor: "#fff",
+        backgroundColor: theme.palette.background.paper,
         borderRadius: 2,
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        boxShadow: theme.shadows[1],
         overflow: "hidden", // Prevent overflow on small screens
       }}
     >
@@ -228,7 +232,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
             size="small"
             sx={{
               "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -239,7 +243,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
             size="small"
             sx={{
               "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -251,7 +255,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
           variant="h4"
           sx={{
             fontWeight: 500,
-            color: "primary.main",
+            color: theme.palette.primary.main,
             fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
             textAlign: "center",
             whiteSpace: { xs: "normal", sm: "nowrap" },
@@ -268,7 +272,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
             size="small"
             sx={{
               "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -279,7 +283,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
             size="small"
             sx={{
               "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.04)",
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -303,7 +307,7 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
               textAlign: "center",
               fontWeight: 600,
               fontSize: { xs: "0.7rem", sm: "0.8rem", md: "1rem" },
-              color: "text.secondary",
+              color: theme.palette.text.secondary,
               py: { xs: 0.5, sm: 1 },
             }}
           >
@@ -332,12 +336,16 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
               sx={{
                 p: { xs: 0.5, sm: 1, md: 1.5 },
                 border: "1px solid",
-                borderColor: dateObj.currentMonth ? "divider" : "transparent",
+                borderColor: dateObj.currentMonth
+                  ? theme.palette.divider
+                  : "transparent",
                 borderRadius: 2,
                 cursor: "pointer",
                 opacity: dateObj.currentMonth ? 1 : 0.4,
                 backgroundColor: dateObj.currentMonth
-                  ? "background.paper"
+                  ? theme.palette.mode === "dark"
+                    ? theme.palette.background.paper
+                    : theme.palette.background.paper
                   : "transparent",
                 transition: "all 0.2s ease-in-out",
                 minHeight: { xs: "60px", sm: "80px", md: "100px" },
@@ -345,9 +353,9 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                 flexDirection: "column",
                 position: "relative",
                 "&:hover": {
-                  backgroundColor: "action.hover",
+                  backgroundColor: theme.palette.action.hover,
                   transform: "translateY(-2px)",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  boxShadow: theme.shadows[2],
                 },
               }}
             >
@@ -356,8 +364,8 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                   fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1.1rem" },
                   fontWeight: dateObj.currentMonth ? 500 : 400,
                   color: dateObj.currentMonth
-                    ? "text.primary"
-                    : "text.secondary",
+                    ? theme.palette.text.primary
+                    : theme.palette.text.secondary,
                 }}
               >
                 {dateObj.day}
@@ -369,13 +377,23 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                     mt: "auto",
                     backgroundColor: (theme) => {
                       const status = dateTasks[0].status;
-                      return status === "COMPLETED"
+                      return theme.palette.mode === "dark"
+                        ? status === "COMPLETED"
+                          ? theme.palette.success.dark
+                          : status === "IN_PROGRESS"
+                          ? theme.palette.warning.dark
+                          : theme.palette.info.dark
+                        : status === "COMPLETED"
                         ? theme.palette.success.light
                         : status === "IN_PROGRESS"
                         ? theme.palette.warning.light
                         : theme.palette.info.light;
                     },
-                    color: "text.primary",
+                    color: theme.palette.getContrastText(
+                      theme.palette.mode === "dark"
+                        ? theme.palette.info.dark
+                        : theme.palette.info.light
+                    ),
                     borderRadius: 1,
                     px: { xs: 0.5, sm: 1 },
                     py: 0.5,
@@ -405,8 +423,11 @@ const CustomCalendar = ({ tasks = [], onDateSelect }) => {
                 <Box
                   sx={{
                     mt: "auto",
-                    backgroundColor: "grey.100",
-                    color: "text.secondary",
+                    backgroundColor:
+                      theme.palette.mode === "dark"
+                        ? theme.palette.grey[800]
+                        : theme.palette.grey[100],
+                    color: theme.palette.text.secondary,
                     borderRadius: 1,
                     px: { xs: 0.5, sm: 1 },
                     py: 0.5,

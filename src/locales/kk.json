@@ -11,13 +11,16 @@
     "language": "Тіл",
     "kazakh": "Қазақша",
     "russian": "Русский",
+    "english": "English",
     "passwordRequired": "Құпиясөзді өзгерту үшін екі өрісті де толтырыңыз.",
     "passwordChanged": "Құпиясөз сәтті өзгертілді!",
     "passwordChangeError": "Құпиясөзді өзгерту қатесі. Ағымдағы құпиясөзді тексеріңіз.",
     "changePassword": "Құпиясөзді өзгерту",
     "currentPassword": "Ағымдағы құпиясөз",
     "newPassword": "Жаңа құпиясөз",
-    "updatePassword": "Құпиясөзді жаңарту"
+    "updatePassword": "Құпиясөзді жаңарту",
+    "theme": "Түс",
+    "enableDarkMode": "Қара түс"
   },
   "tasks": {
     "title": "Тапсырмалар",
@@ -243,7 +246,8 @@
     "investments": "Инвестициялар",
     "additionalIncome": "Қосымша табыс",
     "other": "Басқа",
-    "chartLineLabel": "Кірістер сомасы"
+    "chartLineLabel": "Кірістер сомасы",
+    "exportToExcel": "Excel-ге экспорттау"
   },
   "tips": {
     "title": "Пайдалы кеңестер",

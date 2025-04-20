@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "../context/ThemeContext";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -16,26 +15,24 @@ import { LanguageProvider } from "../context/LanguageContext";
 
 const AppRouter = () => {
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/expenses" element={<Expenses />} />
-            <Route path="/incomes" element={<Incomes />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/tips" element={<Tips />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/achievements" element={<Achievements />} />
-            <Route path="/help" element={<Help />} />
-          </Routes>
-        </Router>
-      </LanguageProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/expenses" element={<Expenses />} />
+          <Route path="/incomes" element={<Incomes />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/tips" element={<Tips />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/help" element={<Help />} />
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 };
 

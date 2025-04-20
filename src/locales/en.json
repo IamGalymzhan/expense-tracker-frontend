@@ -18,7 +18,8 @@
     "changePassword": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
-    "updatePassword": "Update Password"
+    "updatePassword": "Update Password",
+    "enableDarkMode": "Enable Dark Mode"
   },
   "auth": {
     "login": "Login",

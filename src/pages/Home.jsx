@@ -28,10 +28,30 @@ const Home = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
+  // Light theme colors for consistent styling
+  const lightThemeColors = {
+    primary: "#1a237e",
+    secondary: "#f50057",
+    background: "#f4f4f4",
+    paper: "#ffffff",
+    text: {
+      primary: "#000000",
+      secondary: "#616161",
+    },
+  };
+
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: lightThemeColors.background, // Ensure light background for the entire page
+        color: lightThemeColors.text.primary, // Ensure light theme text color
+      }}
+    >
       {/* Header */}
-      <AppBar position="static" sx={{ background: "#1a237e" }}>
+      <AppBar position="static" sx={{ background: lightThemeColors.primary }}>
         <Toolbar
           sx={{
             display: "flex",
@@ -44,6 +64,7 @@ const Home = () => {
             sx={{
               fontWeight: "bold",
               fontSize: { xs: "1.1rem", sm: "1.25rem" },
+              color: "#ffffff",
             }}
           >
             Expence Tracker
@@ -55,7 +76,7 @@ const Home = () => {
               to="/login"
               sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
             >
-              {translations[language].login}
+              Кіру
             </Button>
             <Button
               color="inherit"
@@ -63,7 +84,7 @@ const Home = () => {
               to="/register"
               sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
             >
-              {translations[language].register}
+              Тіркелу
             </Button>
           </Box>
         </Toolbar>
@@ -119,10 +140,15 @@ const Home = () => {
         </Container>
       </Box>
 
-      {/* Features Section */}
+      {/* Features Section - Ensuring light background */}
       <Container
         maxWidth="lg"
-        sx={{ py: { xs: 4, sm: 6, md: 8 }, px: { xs: 2, sm: 3, md: 4 } }}
+        sx={{
+          py: { xs: 4, sm: 6, md: 8 },
+          px: { xs: 2, sm: 3, md: 4 },
+          bgcolor: lightThemeColors.paper,
+          color: lightThemeColors.text.primary,
+        }}
       >
         <Typography
           variant="h3"
@@ -131,6 +157,7 @@ const Home = () => {
           sx={{
             mb: { xs: 4, sm: 5, md: 6 },
             fontSize: { xs: "1.75rem", sm: "2.25rem", md: "3rem" },
+            color: lightThemeColors.text.primary,
           }}
         >
           Платформа мүмкіндіктері
@@ -166,6 +193,7 @@ const Home = () => {
               sx={{
                 fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2rem" },
                 textAlign: { xs: "center", md: "left" },
+                color: lightThemeColors.text.primary,
               }}
             >
               Шығындарды басқару
@@ -176,6 +204,7 @@ const Home = () => {
                 mb: 2,
                 textAlign: { xs: "center", md: "left" },
                 fontSize: { xs: "0.875rem", sm: "1rem" },
+                color: lightThemeColors.text.secondary,
               }}
             >
               Барлық қаржылық операцияларыңызды бір жерде басқаруға мүмкіндік
@@ -186,6 +215,7 @@ const Home = () => {
               sx={{
                 textAlign: { xs: "center", md: "left" },
                 fontSize: { xs: "0.875rem", sm: "1rem" },
+                color: lightThemeColors.text.secondary,
               }}
             >
               Шығындарды категориялар бойынша сұрыптап, олардың динамикасын
@@ -204,6 +234,7 @@ const Home = () => {
                 fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2rem" },
                 textAlign: { xs: "center", md: "left" },
                 mt: { xs: 4, md: 0 },
+                color: lightThemeColors.text.primary,
               }}
             >
               Уақытты бақылау
@@ -214,6 +245,7 @@ const Home = () => {
                 mb: 2,
                 textAlign: { xs: "center", md: "left" },
                 fontSize: { xs: "0.875rem", sm: "1rem" },
+                color: lightThemeColors.text.secondary,
               }}
             >
               Күнделікті жоспарларыңызды реттеп, уақытыңызды тиімді пайдалануға
@@ -224,6 +256,7 @@ const Home = () => {
               sx={{
                 textAlign: { xs: "center", md: "left" },
                 fontSize: { xs: "0.875rem", sm: "1rem" },
+                color: lightThemeColors.text.secondary,
               }}
             >
               Уақытты басқару статистикасы қай істерге көп уақыт жұмсайтыныңызды
@@ -309,6 +342,7 @@ const Home = () => {
             sx={{
               mb: { xs: 4, sm: 5, md: 6 },
               fontSize: { xs: "1.75rem", sm: "2.25rem", md: "3rem" },
+              color: lightThemeColors.text.primary,
             }}
           >
             Байланыс
@@ -322,19 +356,32 @@ const Home = () => {
                   textAlign: "center",
                   height: "100%",
                   mb: { xs: 2, sm: 0 },
+                  bgcolor: lightThemeColors.paper,
                 }}
               >
                 <LocationOnIcon
-                  sx={{ fontSize: { xs: 32, sm: 40 }, color: "#1a237e", mb: 2 }}
+                  sx={{
+                    fontSize: { xs: 32, sm: 40 },
+                    color: lightThemeColors.primary,
+                    mb: 2,
+                  }}
                 />
                 <Typography
                   variant="h6"
                   gutterBottom
-                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                  sx={{
+                    fontSize: { xs: "1rem", sm: "1.25rem" },
+                    color: lightThemeColors.text.primary,
+                  }}
                 >
                   Мекен-жайы
                 </Typography>
-                <Typography sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}>
+                <Typography
+                  sx={{
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                    color: lightThemeColors.text.secondary,
+                  }}
+                >
                   Қазақстан, Астана қ.
                 </Typography>
               </Paper>
@@ -347,15 +394,23 @@ const Home = () => {
                   textAlign: "center",
                   height: "100%",
                   mb: { xs: 2, sm: 0 },
+                  bgcolor: lightThemeColors.paper,
                 }}
               >
                 <EmailIcon
-                  sx={{ fontSize: { xs: 32, sm: 40 }, color: "#1a237e", mb: 2 }}
+                  sx={{
+                    fontSize: { xs: 32, sm: 40 },
+                    color: lightThemeColors.primary,
+                    mb: 2,
+                  }}
                 />
                 <Typography
                   variant="h6"
                   gutterBottom
-                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                  sx={{
+                    fontSize: { xs: "1rem", sm: "1.25rem" },
+                    color: lightThemeColors.text.primary,
+                  }}
                 >
                   E-mail
                 </Typography>
@@ -363,6 +418,7 @@ const Home = () => {
                   sx={{
                     fontSize: { xs: "0.875rem", sm: "1rem" },
                     wordBreak: "break-word",
+                    color: lightThemeColors.text.secondary,
                   }}
                 >
                   support.expence-tracker@gmail.com
@@ -376,19 +432,32 @@ const Home = () => {
                   p: { xs: 2, sm: 3 },
                   textAlign: "center",
                   height: "100%",
+                  bgcolor: lightThemeColors.paper,
                 }}
               >
                 <PhoneIcon
-                  sx={{ fontSize: { xs: 32, sm: 40 }, color: "#1a237e", mb: 2 }}
+                  sx={{
+                    fontSize: { xs: 32, sm: 40 },
+                    color: lightThemeColors.primary,
+                    mb: 2,
+                  }}
                 />
                 <Typography
                   variant="h6"
                   gutterBottom
-                  sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }}
+                  sx={{
+                    fontSize: { xs: "1rem", sm: "1.25rem" },
+                    color: lightThemeColors.text.primary,
+                  }}
                 >
                   Телефон
                 </Typography>
-                <Typography sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}>
+                <Typography
+                  sx={{
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                    color: lightThemeColors.text.secondary,
+                  }}
+                >
                   +7 777 777 7777
                 </Typography>
               </Paper>

@@ -133,6 +133,9 @@ const Register = () => {
               onChange={handleChange}
               required
               fullWidth
+              InputProps={{
+                sx: { color: "black" },
+              }}
             />
             <TextField
               label={t("auth.email")}
@@ -142,6 +145,9 @@ const Register = () => {
               onChange={handleChange}
               required
               fullWidth
+              InputProps={{
+                sx: { color: "black" },
+              }}
             />
             <TextField
               label={t("auth.password")}
@@ -151,18 +157,25 @@ const Register = () => {
               onChange={handleChange}
               required
               fullWidth
+              InputProps={{
+                sx: { color: "black" },
+              }}
             />
             <Button
               type="submit"
               variant="contained"
               color="primary"
               size="large"
+              sx={{
+                bgcolor: "#1a237e",
+                "&:hover": { bgcolor: "#0d1b60" },
+              }}
             >
               {t("auth.register")}
             </Button>
           </Box>
           <Box sx={{ mt: 2 }}>
-            <Link component={RouterLink} to="/login" color="primary">
+            <Link component={RouterLink} to="/login" sx={{ color: "#1a237e" }}>
               {t("auth.hasAccount")}
             </Link>
           </Box>
@@ -174,7 +187,7 @@ const Register = () => {
         component="footer"
         sx={{ background: "#1A1A1A", p: 3, textAlign: "center", mt: "auto" }}
       >
-        <Typography>
+        <Typography color="white">
           © 2025 Expense Tracker. {t("footer.rightsReserved")}
         </Typography>
       </Box>

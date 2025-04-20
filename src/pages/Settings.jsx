@@ -14,6 +14,7 @@ import {
   TextField,
   Button,
   FormControlLabel,
+  useTheme,
 } from "@mui/material";
 import { ThemeContext } from "../context/ThemeContext";
 import { LanguageContext } from "../context/LanguageContext";
@@ -28,7 +29,8 @@ import { userService } from "../services";
 
 const Settings = () => {
   const { t } = useTranslation();
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const theme = useTheme();
+  const { themeMode, toggleTheme } = useContext(ThemeContext);
   const { language, changeLanguage } = useContext(LanguageContext);
 
   const [notifications, setNotifications] = useState(false);
@@ -38,7 +40,7 @@ const Settings = () => {
   const [email, setEmail] = useState("");
   const [settings, setSettings] = useState({
     language: language,
-    theme: theme,
+    theme: themeMode,
     notifications: notifications,
   });
 
@@ -67,7 +69,11 @@ const Settings = () => {
       await userService.updateProfile({
         name,
         email,
-        preferences: { ...settings, notifications: notifications },
+        preferences: {
+          ...settings,
+          notifications: notifications,
+          theme: themeMode,
+        },
       });
 
       // Refresh the settings to show updated values
@@ -98,6 +104,14 @@ const Settings = () => {
     setSettings((prev) => ({ ...prev, notifications: newValue }));
   };
 
+  const handleThemeChange = () => {
+    toggleTheme();
+    setSettings((prev) => ({
+      ...prev,
+      theme: themeMode === "light" ? "dark" : "light",
+    }));
+  };
+
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
@@ -114,7 +128,7 @@ const Settings = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 1, sm: 2, md: 3 },
-          bgcolor: "#f8fafc",
+          bgcolor: theme.palette.background.default,
           minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
@@ -127,7 +141,7 @@ const Settings = () => {
             sx={{
               fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
               mb: { xs: 2, sm: 3 },
-              color: "#1a237e",
+              color: theme.palette.primary.main,
               textAlign: "center",
             }}
           >
@@ -141,8 +155,11 @@ const Settings = () => {
               p: { xs: 1.5, sm: 2, md: 3 },
               mb: 4,
               borderRadius: 2,
-              bgcolor: "white",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 1px 3px rgba(0,0,0,0.5)"
+                  : "0 1px 3px rgba(0,0,0,0.1)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -155,6 +172,7 @@ const Settings = () => {
                 fontSize: { xs: "1.1rem", sm: "1.25rem" },
                 textAlign: "center",
                 mb: 3,
+                color: theme.palette.text.primary,
               }}
             >
               {t("settings.profile")}
@@ -178,11 +196,14 @@ const Settings = () => {
                 variant="contained"
                 onClick={handleSaveSettings}
                 sx={{
-                  bgcolor: "#1a237e",
+                  bgcolor: theme.palette.primary.main,
                   "&:hover": {
-                    bgcolor: "#0d1b60",
+                    bgcolor: theme.palette.primary.dark,
                   },
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                  boxShadow:
+                    theme.palette.mode === "dark"
+                      ? "0 1px 3px rgba(0,0,0,0.5)"
+                      : "0 1px 3px rgba(0,0,0,0.1)",
                   minWidth: "150px",
                   alignSelf: "center",
                 }}
@@ -199,8 +220,11 @@ const Settings = () => {
               p: { xs: 1.5, sm: 2, md: 3 },
               mb: 4,
               borderRadius: 2,
-              bgcolor: "white",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              bgcolor: theme.palette.background.paper,
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 1px 3px rgba(0,0,0,0.5)"
+                  : "0 1px 3px rgba(0,0,0,0.1)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -215,6 +239,7 @@ const Settings = () => {
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
                   textAlign: "center",
                   mb: 3,
+                  color: theme.palette.text.primary,
                 }}
               >
                 {t("settings.notifications")}
@@ -232,6 +257,33 @@ const Settings = () => {
               </Box>
             </Box>
 
+            {/* Theme Settings */}
+            <Box sx={{ width: "100%", maxWidth: "500px", mb: 4 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                  textAlign: "center",
+                  mb: 3,
+                  color: theme.palette.text.primary,
+                }}
+              >
+                {t("settings.theme")}
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={themeMode === "dark"}
+                      onChange={handleThemeChange}
+                    />
+                  }
+                  label={t("settings.enableDarkMode")}
+                />
+              </Box>
+            </Box>
+
             {/* Language Settings */}
             <Box sx={{ width: "100%", maxWidth: "500px", mb: 4 }}>
               <Typography
@@ -241,6 +293,7 @@ const Settings = () => {
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
                   textAlign: "center",
                   mb: 3,
+                  color: theme.palette.text.primary,
                 }}
               >
                 {t("settings.language")}
